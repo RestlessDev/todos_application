@@ -1,0 +1,9 @@
+<div class="<%= args.class %>">
+  <h1><%= args.title %></h1>
+
+  <% if(args.descendents.hasOwnProperty("Navigation") && Array.isArray(args.descendents['Navigation'])) { 
+      let navigation = args.descendents['Navigation'][0];
+    %>
+  
+  <% } %>
+</div>

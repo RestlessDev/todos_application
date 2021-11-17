@@ -1,0 +1,44 @@
+{
+  "id":"App",
+  "render": "ejs",
+  "arguments":{
+    "class": {
+      "type":"string",
+      "required": "false"
+    }
+  },
+  "descendents":{
+    "PageContent": true,
+    "Navbar": {
+      "render": "json"
+    },
+    "Navigation": {
+      "render": "json"
+    },
+    "NavItem": {
+      "render": "json",
+      "arguments": {
+        "label": {
+          "type":"string",
+          "required":true
+        },
+        "href": {
+          "type":"url",
+          "required":false
+        }
+      }
+    },
+    "Logo" : {
+      "render": "json",
+      "arguments": {
+        "src": {
+          "type":"url",
+          "required":true
+        }
+      }
+    }
+  },
+  "libraries": [
+    
+  ]
+}
