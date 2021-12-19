@@ -1,0 +1,19 @@
+.app {
+  padding: 25px;
+  background-color: #dedede;
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    .logo {
+      max-width: 200px;
+    }
+    .navigation {
+      > li {
+        float: left;
+        padding: 10px 30px;
+      }
+    }
+  }
+}

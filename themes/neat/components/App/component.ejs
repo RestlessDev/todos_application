@@ -1,9 +1,47 @@
-<div class="<%= args.class %>">
-  <h1><%= args.title %></h1>
-
-  <% if(args.descendents.hasOwnProperty("Navigation") && Array.isArray(args.descendents['Navigation'])) { 
-      let navigation = args.descendents['Navigation'][0];
-    %>
-  
-  <% } %>
+<div class="app <%= args.class %>">
+  <div class="navbar">
+  <% 
+    function renderNavItem(navItem) {
+      let retval = `<li class="navitem">`;
+      if(navItem.hasOwnProperty('href')) {
+        retval += `<a href="${navItem.href}">`;
+      }
+      if(navItem.hasOwnProperty('label')) {
+        retval += `${navItem.label}`;
+      }
+      if(navItem.hasOwnProperty('href')) {
+        retval += `</a>`;
+      }
+      if(navItem.descendents.hasOwnProperty("NavItem") && Array.isArray(navItem.descendents["NavItem"])) {
+        retval += `<ul class="sub-navigation">`
+        for(let j = 0; j < navItem.descendents["NavItem"].length; j++) {
+          retval += renderNavItem(navItem.descendents["NavItem"][j])
+        }  
+        retval += `</ul>`;
+      }
+      return retval;
+    }
+    if(args.descendents.hasOwnProperty("Navbar") && Array.isArray(args.descendents['Navbar'])) { 
+      let navBar = args.descendents['NavBar'][0];
+      if(navBar.descendents.hasOwnProperty('Logo') && Array.isArray(args.descendents['Logo']))  {
+        let logo = navBar.descendents['Logo'];
+        if(logo.src) {
+          %><img class="logo" src="<%= logo.href %>" title="<%= args.title %>" /><%
+        }
+      }
+      if(navBar.descendents.hasOwnProperty("Navigation") && Array.isArray(nabBar.descendents['Navigation'])) { 
+        let navigation = navBar.descendents['Navigation'][0];
+        if(navigation.descendents.hasOwnProperty("NavItem") && Array.isArray(navigation.descendents['NavItem'])) {
+          %><ul class="navigation"><% 
+          for(let i = 0; i < navigation.descendents['NavItem'].length; i++) {
+            %><%- renderNavItem(navigation.descendents['NavItem'][i]) %><%
+          }  
+          %></ul><%
+        }
+      %>
+    <% }
+      } %>
+    </div>
+    <h1><%= args.title %></h1>
+    <PageContent />
 </div>

@@ -2,10 +2,7 @@
   "id":"App",
   "render": "ejs",
   "arguments":{
-    "class": {
-      "type":"string",
-      "required": "false"
-    }
+    
   },
   "descendents":{
     "PageContent": true,
