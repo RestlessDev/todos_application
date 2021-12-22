@@ -2,10 +2,10 @@ exports.component = component = () => {
   const name = "App";
   return {
     name: name,
-    initialize: () => {
-      console.log(`Initializing component "${name}"`); 
+    initialize: (id) => {
+      console.log(`Initializing component "${name}" with id "${id}"`); 
     },
-    update: (context) => {
+    update: (id, context) => {
       console.log(`Updating component "${name}" with context:`, context); 
     }
   }
