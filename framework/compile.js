@@ -193,6 +193,18 @@ if(appConfig) {
             }
           }
         }
+
+        // load the component
+        let component = require(`${__baseDir}/app/components/${themeComponents[i]}/component.js`);
+        if(componentConfig.hasOwnProperty('render') && componentConfig.render == 'ejs') {
+          if(fs.existsSync(`${__baseDir}/app/components/${themeComponents[i]}/component.ejs`)) {
+            component.template = fs.readFileSync(`${__baseDir}/app/components/${themeComponents[i]}/component.ejs`)
+          }
+        }
+
+        // add the new component to the component list
+        components[themeComponents[i]] = component; 
+
       } catch(e) {
         console.log(`Cannot open component file at "${__baseDir}/themes/${appConfig.theme}/components/${themeComponents[i]}/component.json"`);
       }
@@ -201,4 +213,6 @@ if(appConfig) {
   } else {
     console.log(`Theme components not found at "${__baseDir}/themes/${appConfig.theme}/components"`);
   }
+
+  fs.writeFileSync(`${__baseDir}/build/components.js`, JSON.stringify(components, function(key, val) { return (typeof val === 'function') ? '[function]' : val; }, 4));
 }
