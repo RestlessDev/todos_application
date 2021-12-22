@@ -1,4 +1,4 @@
-export const component = () => {
+exports.component = component = () => {
   const name = "App";
   return {
     name: name,

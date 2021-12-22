@@ -1,8 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-
-const __baseDir = `${__dirname}/..`;
+const __baseDir = process.cwd(); // `${__dirname}/..`;
 
 
 /*
@@ -114,10 +113,11 @@ if(appConfig) {
             }
           }
 
-          let component = require(`${__baseDir}/themes/${appConfig.theme}/components/${themeComponents[i]}/component.js`);
+          let componentFunc = require(`${__baseDir}/themes/${appConfig.theme}/components/${themeComponents[i]}/component.js`);
+          let component = componentFunc.component();
           if(componentConfig.hasOwnProperty('render') && componentConfig.render == 'ejs') {
             if(fs.existsSync(`${__baseDir}/themes/${appConfig.theme}/components/${themeComponents[i]}/component.ejs`)) {
-              component.template = fs.readFileSync(`${__baseDir}/themes/${appConfig.theme}/components/${themeComponents[i]}/component.ejs`)
+              component.template = fs.readFileSync(`${__baseDir}/themes/${appConfig.theme}/components/${themeComponents[i]}/component.ejs`).toString();
             }
           }
 
@@ -125,6 +125,7 @@ if(appConfig) {
           components[themeComponents[i]] = component; 
 
         } catch(e) {
+          console.log(e)
           console.log(`Cannot open component file at "${__baseDir}/themes/${appConfig.theme}/components/${themeComponents[i]}/component.json"`);
         }
       }
@@ -195,7 +196,8 @@ if(appConfig) {
         }
 
         // load the component
-        let component = require(`${__baseDir}/app/components/${themeComponents[i]}/component.js`);
+        let componentFunc = require(`${__baseDir}/app/components/${themeComponents[i]}/component.js`)();
+        let component = componentFunc.component();
         if(componentConfig.hasOwnProperty('render') && componentConfig.render == 'ejs') {
           if(fs.existsSync(`${__baseDir}/app/components/${themeComponents[i]}/component.ejs`)) {
             component.template = fs.readFileSync(`${__baseDir}/app/components/${themeComponents[i]}/component.ejs`)
@@ -214,5 +216,27 @@ if(appConfig) {
     console.log(`Theme components not found at "${__baseDir}/themes/${appConfig.theme}/components"`);
   }
 
-  fs.writeFileSync(`${__baseDir}/build/components.js`, JSON.stringify(components, function(key, val) { return (typeof val === 'function') ? '[function]' : val; }, 4));
+  // this is needed to print out the actual function definitions
+  // keep a list of serialized functions
+  const serializableFunctions = [];
+
+  // json replacer - returns a placeholder for functions
+  const jsonReplacer = function (key, val) {
+      if (typeof val === 'function') {
+        serializableFunctions.push(val.toString());
+          
+        return "{func_" + (serializableFunctions.length - 1) + "}";
+      }
+          
+      return val;
+  };
+
+  // regex replacer - replaces placeholders with functions
+  const funcReplacer = function (match, id) {
+    return serializableFunctions[id];
+  };
+
+  let componentsString = JSON.stringify(components, jsonReplacer, 2).replace(/"\{func_(\d+)\}"/g, funcReplacer);;
+
+  fs.writeFileSync(`${__baseDir}/build/components.js`, `let components = ` + componentsString);
 }
