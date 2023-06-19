@@ -6,7 +6,7 @@ exports.component = component = () => {
       console.log(`Initializing component "${name}" with id "${id}"`); 
     },
     update: (id, context) => {
-      console.log(`Updating component "${name}" with context:`, context); 
+      console.log(`Updating component "${name}" with id "${id}" and context:`, context); 
     }
   }
 };
