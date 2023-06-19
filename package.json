@@ -9,8 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.4.0",
     "cash-dom": "^8.1.0",
-    "fast-xml-parser": "^3.21.1",
+    "chalk": "^4.1.2",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "fast-xml-parser": "^4.2.4",
     "path": "^0.12.7"
+  },
+  "bin": {
+    "erstwhile": "./framework/bin/erstwhileCLI.js"
   }
 }
