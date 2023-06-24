@@ -1,4 +1,4 @@
-{
+let config = {
   "title":"Erstwhile Test Application",
   "theme": "neat",
   "styles": {
@@ -54,5 +54,8 @@
     "bs-body-line-height": "1.5",
     "bs-body-color": "#6c757d",
     "bs-body-bg": "#f5f7fb"
-  }
+  },
+  "baseURL": "http://localhost:8022"
 }
+
+module.exports = config;

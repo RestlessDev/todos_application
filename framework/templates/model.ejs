@@ -1,0 +1,64 @@
+const axios = require('axios');
+const ErstwhileModel = require('../../framework/static/models/ErstwhileModel')
+const AuthenticationError = require('../../framework/static/errors/AuthenticationError')
+
+<% 
+let exports = [];
+
+for(let entityKey in entities) { 
+  let entity = entities[entityKey];
+  let entityClassname = (entityKey.charAt(0).toUpperCase() + entityKey.slice(1));
+  exports.push(entityClassname);
+  %>
+/**
+ * <%= entity.name %> - v<%= version %>
+ */
+
+class <%= entityClassname %> extends ErstwhileModel {
+  <% for(let key in entity.methods ) { 
+    let endpoint = entity.methods[key];
+    %>
+    static async <%= key %>(data, params) {
+      try {
+        let headers = {};
+        <% if(application.sessionKey && application.sessionKey.type == "erstwhile-custom-header") { %>
+        if(window.localStorage.erstwhileSessionKey) {
+          headers['<%= application.sessionKey.header %>'] = window.localStorage.erstwhileSessionKey;
+        }
+        <% } %>
+        <% if(endpoint.fields && endpoint.fields.type == "json") { %>
+        headers['Content-Type'] = "application/json";
+        <% } %>
+        
+        let response = await this.makeRequest('<%= endpoint.endpoint %>', params, '<%= endpoint.method %>', data, headers);
+        <% if(endpoint.requiresAuthentication ) { %>
+          if(response.data.authenticated === false) {
+            throw new AuthenticationError("This endpoint requires authentication.");
+          } 
+        <% } %>
+
+        <% if(application.sessionKey && application.sessionKey.type == "erstwhile-custom-header" && endpoint.login === true) { %>
+        if(typeof response.data == 'object' && !Array.isArray(response.data)) {
+          for(let responseKey in response.data) {
+            if(responseKey == 'sessionKey') {
+              window.localStorage.erstwhileSessionKey = response.data['sessionKey'];
+            }
+          }
+        }
+        <% } %>
+        return response;
+      } catch(e) {
+        throw e;
+      }
+    }
+  <% } %>
+}
+
+<% } %>
+
+<% if(exports.length > 0) { %>
+module.exports = {
+  <% for(let exportIndex in exports ) { %>
+  <%= exports[exportIndex] %>,<% } %>
+}
+<% } %>
