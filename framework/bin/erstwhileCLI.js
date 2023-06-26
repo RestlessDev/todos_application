@@ -14,8 +14,12 @@ const argumentMatrix = {
     "build": {
         "subcommands": {
             "models": {
-                "requiresSubcommands": false,
-                "description": "This subcommand attempts to connect to an Erstwhile-compatible server and build out the Models."
+              "requiresSubcommands": false,
+              "description": "This subcommand attempts to connect to an Erstwhile-compatible server and build out the Models."
+            },
+            "workingDirectory": {
+              "requiresSubcommands": false,
+              "description": "This subcommand creates the working directory needed for compilation of the application."
             }
         },
         "description": `This command outputs files into the project structure.`,
@@ -129,5 +133,40 @@ if(primaryCommand == 'build') {
         // always executed
       });
     }
+  } else if(subCommand == "workingDirectory") {
+    // get the config
+    const config = require(`${process.cwd()}/app/config.js`);
+    
+    // ensure all of the required libraries are present
+
+    // build the theme CSS
+    if(!fs.existsSync(`${process.cwd()}/themes/${config.theme}/theme.js`)) {
+      console.log(`Theme "${config.theme}" not found in /themes`);
+    } else {
+      const themeClass = require(`${process.cwd()}/themes/${config.theme}/theme`);
+
+      let requires = themeClass.getRequires(), requiresSuccess = true;
+      for(let i = 0; i < requires.length; i++) {
+        try {
+          let temp = require(requires[i]);
+        } catch(r) {
+          requiresSuccess = false;
+          console.log(`Library "${requires[i]}" not found.`);
+        } 
+      } 
+      if(requiresSuccess) {
+        // create the working directory if it does not exist, empty it if it does
+        if(!fs.existsSync(`${process.cwd()}/build`)) {
+          fs.mkdirSync(`${process.cwd()}/build`);
+        } else {
+          let files = fs.readdirSync(`${process.cwd()}/build`);
+          for (const file of files) {
+            fs.unlinkSync(path.join(directory, file));
+          }
+        }
+      }
+    }
+    
+
   }
 }

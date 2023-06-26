@@ -16,7 +16,8 @@
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "fast-xml-parser": "^4.2.4",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "sass": "^1.63.6"
   },
   "bin": {
     "erstwhile": "./framework/bin/erstwhileCLI.js"

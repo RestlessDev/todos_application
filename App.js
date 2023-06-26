@@ -4,7 +4,7 @@ let App = require("./framework/base/App");
 const { Authentication, Todo } = require('./app/models/models')
 
 if(!window.localStorage.erstwhileSessionKey) {
-  Authentication.login({}, {
+  Authentication.login({
     "username": "mikearace",
     "password": "AbC&^30Uy"
   }).then(function(response) {
