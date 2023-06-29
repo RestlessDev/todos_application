@@ -110,14 +110,14 @@
 }
 
 // Form Validation
-
 @mixin form-validation-state(
   $state: null,
   $color: null,
   $icon: null,
   $tooltip-color: null,
   $tooltip-bg-color: null,
-  $focus-box-shadow: null
+  $focus-box-shadow: null,
+  $border-color: null
 ) {
 }
 

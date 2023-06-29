@@ -1,7 +1,10 @@
 @import '_bootstrap-extended/include';
 
+@import '<%- appRoot %>/node_modules/bootstrap/scss/root';
+
 // Import bootstrap extended scss
-@import '_bootstrap-extended/root';
+// @import '_bootstrap-extended/root';
+@import '<%- appRoot %>/node_modules/bootstrap/scss/root';
 @import '_bootstrap-extended/reboot';
 @import '_bootstrap-extended/type';
 @import '_bootstrap-extended/utilities';

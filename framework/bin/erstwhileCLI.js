@@ -5,6 +5,9 @@ const ejs = require('ejs');
 const chalk = require('chalk');
 const axios = require('axios');
 const fs = require('fs');
+const path = require('path');
+
+const { theme } = require('../../app/config/app');
 
 /**
  * This is the command matrix for Erstwhile
@@ -135,9 +138,13 @@ if(primaryCommand == 'build') {
     }
   } else if(subCommand == "workingDirectory") {
     // get the config
-    const config = require(`${process.cwd()}/app/config.js`);
+    const config = require(`${process.cwd()}/app/config/app.js`);
     
-    // ensure all of the required libraries are present
+    /**
+     * Some Variables
+     */
+    let components = {};
+
 
     // build the theme CSS
     if(!fs.existsSync(`${process.cwd()}/themes/${config.theme}/theme.js`)) {
@@ -145,6 +152,7 @@ if(primaryCommand == 'build') {
     } else {
       const themeClass = require(`${process.cwd()}/themes/${config.theme}/theme`);
 
+      // ensure all of the required libraries are present
       let requires = themeClass.getRequires(), requiresSuccess = true;
       for(let i = 0; i < requires.length; i++) {
         try {
@@ -161,9 +169,66 @@ if(primaryCommand == 'build') {
         } else {
           let files = fs.readdirSync(`${process.cwd()}/build`);
           for (const file of files) {
-            fs.unlinkSync(path.join(directory, file));
+            fs.rmSync(path.join(`${process.cwd()}/build`, file), {recursive: true, force: true});
           }
         }
+
+        // get the theme CSS, save it into the working directory
+        let cssFile = themeClass.getCSS(process.cwd(), `${process.cwd()}/build`, config.themeConfig || {}) + `\n\n`;
+
+        // grab each theme component
+        let componentDirectories = fs.readdirSync(`${process.cwd()}/themes/${config.theme}`);
+        for(let i in componentDirectories) {
+          if(
+            fs.lstatSync(`${process.cwd()}/themes/${config.theme}/${componentDirectories[i]}`).isDirectory() &&
+            fs.existsSync(`${process.cwd()}/themes/${config.theme}/${componentDirectories[i]}/component.js`)) {
+            components[componentDirectories[i].toLowerCase()] = require(`${process.cwd()}/themes/${config.theme}/${componentDirectories[i]}/component`);
+            if(!components[componentDirectories[i].toLowerCase()].hasOwnProperty('getCSS')) {
+              console.log(`Notice: Component ${componentDirectories[i]} in theme does not seem to be valid. Skipped.`)
+              delete components[componentDirectories[i].toLowerCase()];
+            } 
+          } 
+        }
+
+        // grab each app component, overwriting the theme as is necessary
+        if(fs.existsSync(`${process.cwd()}/app/components`) && fs.lstatSync(`${process.cwd()}/app/components`).isDirectory()) {
+          componentDirectories = fs.readdirSync(`${process.cwd()}/app/components`);
+          for(let i in componentDirectories) {
+            if(
+              fs.lstatSync(`${process.cwd()}/app/components/${componentDirectories[i]}`).isDirectory() &&
+              fs.existsSync(`${process.cwd()}/app/components/${componentDirectories[i]}/component.js`)) {
+              components[componentDirectories[i].toLowerCase()] = require(`${process.cwd()}/app/components/${componentDirectories[i]}/component`);
+              if(!components[componentDirectories[i].toLowerCase()].hasOwnProperty('getCSS')) {
+                console.log(`Notice: Component ${componentDirectories[i]} in app does not seem to be valid. Skipped.`)
+                delete components[componentDirectories[i].toLowerCase()];
+              } 
+            } 
+          }
+        }
+
+        // now that we have the components, get their CSS.
+        for(let componentKey in components) {
+          cssFile += components[componentKey].getCSS(process.cwd(), `${process.cwd()}/build`, config.themeConfig || {}) + `\n\n`;
+        }
+
+        // set up the dist directory
+        if(!fs.existsSync(`${process.cwd()}/dist`)) {
+          fs.mkdirSync(`${process.cwd()}/dist`);
+        } else {
+          let files = fs.readdirSync(`${process.cwd()}/dist`);
+          for (const file of files) {
+            fs.rmSync(path.join(`${process.cwd()}/dist`, file), {recursive: true, force: true});
+          }
+        }
+        fs.mkdirSync(`${process.cwd()}/dist/assets`);
+        fs.mkdirSync(`${process.cwd()}/dist/assets/css`);
+        fs.mkdirSync(`${process.cwd()}/dist/assets/js`);
+        
+        fs.writeFileSync(`${process.cwd()}/dist/assets/css/style.css`, cssFile);
+
+        // render index.html
+        let indexFile = ejs.render(fs.readFileSync(`${process.cwd()}/framework/base/public/index.html`, 'utf8'), {title: config.title || "Erstwhile Test App"});
+        fs.writeFileSync(`${process.cwd()}/dist/index.html`, indexFile);
       }
     }
     

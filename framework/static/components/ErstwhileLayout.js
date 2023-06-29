@@ -13,10 +13,6 @@ class ErstwhileLayout extends ErstwhileComponent {
     return [];
   }
 
-  getSCSS() {
-    return '';
-  }
-
   initialize(args, next) {
     this.args = args;
     next()

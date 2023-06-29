@@ -12,7 +12,7 @@ class ErstwhileComponent {
     return [];
   }
 
-  getCSS() {
+  static getCSS(appRoot, workingDirectory, themeConfig) {
     return '';
   }
 

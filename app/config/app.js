@@ -1,5 +1,5 @@
 let config = {
-  "title":"Erstwhile Test Application",
+  "title":"Todos Test Application",
   "theme": "sneat",
   "baseURL": "http://localhost:8022"
 }

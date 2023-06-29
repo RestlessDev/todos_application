@@ -6,7 +6,7 @@ class ErstwhileTheme {
     return [];
   }
 
-  static getCSS(appRoot, workingDirectory) {
+  static getCSS(appRoot, workingDirectory, themeConfig) {
     return '';
   }
 
