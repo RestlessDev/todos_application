@@ -1,7 +1,7 @@
-let config = require("./app/config");
-let App = require("./framework/base/App");
+let config = require("./config/app");
+let App = require("../framework/base/App");
 
-const { Authentication, Todo } = require('./app/models/models')
+const { Authentication, Todo } = require('./models/models')
 
 if(!window.localStorage.erstwhileSessionKey) {
   Authentication.login({

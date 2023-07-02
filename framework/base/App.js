@@ -1,6 +1,3 @@
-var App = {
-  config: {
-    baseURL: "http://localhost:8022"
-  }
-}
-module.exports = App;
+let config = require("../../app/config/app");
+// let App = require("./framework/base/App");
+
