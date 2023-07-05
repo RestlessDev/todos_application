@@ -1,6 +1,6 @@
 let config = {
   "title":"Todos Test Application",
-  "theme": "sneat",
+  "theme": "mazer",
   "baseURL": "http://localhost:8022"
 }
 

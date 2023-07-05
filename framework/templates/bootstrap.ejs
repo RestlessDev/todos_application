@@ -1,0 +1,31 @@
+const AppClass = require("./App");
+
+let routes = <%- routes %>;
+let modals = <%- modals %>;
+let ejs = <%- ejs %>;
+let componentList = <%- componentList %>;
+let controllerList = <%- controllerList %>;
+let controllers = {};
+let components = {};
+
+// we need to require and instantiate all of the controllers
+for(let i in controllerList) {
+  let temp = require(`./controllers/${controllerList[i]}`);
+  controllers[controllerList[i]] = new temp(); 
+}
+
+// we need to require and instantiate all of the controllers
+for(let i in componentList) {
+  let temp = require(`./components/${componentList[i]}/component`);
+  components[componentList[i].toLowerCase()] = new temp(); 
+}
+
+var App = new AppClass();
+
+App.setRoutes(routes);
+App.setModals(modals);
+App.setComponents(components);
+App.setControllers(controllers);
+App.setEJS(ejs);
+
+App.openPath(window.location.pathname);

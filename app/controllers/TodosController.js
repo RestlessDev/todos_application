@@ -8,4 +8,22 @@ class TodosController extends ErstwhileController {
       next();
     }
   }
+
+  listAction(args) {
+    console.log("list!")
+  }
+
+  todoAction(args) {
+    console.log("todo!")
+  }
+
+  createTodoModal(args) {
+
+  }
+
+  editTodoModal(args) {
+    
+  }
 }
+
+module.exports = TodosController;

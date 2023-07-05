@@ -6,7 +6,8 @@ const webpack = require('webpack')
 const ErstwhileCompiler = require('./framework/static/ErstwhileCompiler')
 
 module.exports = {
-  entry: './build/App.js',
+  entry: './build/bootstrap.js',
+  target: 'web',
   module: {
     rules: [
       { test: /\.css$/, use: [ 'style-loader', 'css-loader' ] }
@@ -29,8 +30,23 @@ module.exports = {
     },
     compress: true,
     port: 8080,
+    historyApiFallback: {
+      index: 'index.html'
+    }
+  },
+  resolve: {
+    modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
+    extensions: [".js"],
+    alias: {process: "process/browser"},
+    fallback: {
+      "fs": false,
+      "path": require.resolve("path-browserify")
+    }
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
     // new HtmlWebpackPlugin(),
     /*
     {

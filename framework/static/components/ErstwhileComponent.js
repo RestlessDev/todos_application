@@ -1,8 +1,8 @@
-let App = require("../../base/App");
-
 class ErstwhileComponent {
 
   args = {}
+
+  ejs = false;
 
   constructor() {
     //do nothing
@@ -14,6 +14,10 @@ class ErstwhileComponent {
 
   static getCSS(appRoot, workingDirectory, themeConfig) {
     return '';
+  }
+
+  setEJS(ejs) {
+    this.ejs = ejs;
   }
 
   initialize(args, next) {

@@ -1,4 +1,3 @@
-
 class ErstwhileController {
 
   preAction(next) {
@@ -25,7 +24,6 @@ class ErstwhileController {
   getRoutes() {
     return false;
   }
-
 
 }
 

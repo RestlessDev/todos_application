@@ -1,8 +1,14 @@
 let config = require("./config/app");
-let App = require("../framework/base/App");
+let ErstwhileApp = require("../framework/static/ErstwhileApp")
 
 const { Authentication, Todo } = require('./models/models')
 
+class TodosApp extends ErstwhileApp {
+
+}
+
+module.exports = TodosApp;
+/*
 if(!window.localStorage.erstwhileSessionKey) {
   Authentication.login({
     "username": "mikearace",
@@ -23,3 +29,4 @@ if(!window.localStorage.erstwhileSessionKey) {
     console.log("error", e)
   });
 }
+*/

@@ -3,28 +3,10 @@ let ErstwhileComponent = require('./ErstwhileComponent')
 
 class ErstwhileLayout extends ErstwhileComponent {
 
-  args = {}
+  getBodyClasses() {
 
-  constructor() {
-    //do nothing
   }
-
-  getRequires() {
-    return [];
-  }
-
-  initialize(args, next) {
-    this.args = args;
-    next()
-  }
-
-  receiveUpdate(args) {
-    this.args = {...this.args, args}
-  }
-
-  unload() {
-    return true;
-  }
+  
 }
 
 module.exports = ErstwhileLayout;
