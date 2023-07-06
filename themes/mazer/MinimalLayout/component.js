@@ -1,9 +1,9 @@
 
+const ErstwhileLayout = require('../../../framework/static/components/ErstwhileLayout')
 const ErstwhileComponent = require('../../../framework/static/components/ErstwhileComponent')
 const ejs = require('ejs');
-const ErstwhileLayout = require('../../../framework/static/components/ErstwhileLayout');
 
-class FullLayout extends ErstwhileLayout {
+class MinimalLayout extends ErstwhileLayout {
   getRequires() {
     return [
       'jquery'
@@ -14,4 +14,4 @@ class FullLayout extends ErstwhileLayout {
   }
 }
 
-module.exports = FullLayout;
+module.exports = MinimalLayout;
