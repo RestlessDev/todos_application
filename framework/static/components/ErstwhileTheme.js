@@ -10,6 +10,10 @@ class ErstwhileTheme {
     return '';
   }
 
+  static getFontFolder(appRoot) {
+    return false;
+  }
+
   getScript() {
     return '';
   }

@@ -1,6 +1,7 @@
 const jquery = require("jquery");
 const { XMLParser, XMLBuilder, XMLValidator} = require("fast-xml-parser");
 const ejs = require('ejs');
+const { v4: uuidv4 } = require('uuid');
 
 class ErstwhileApp {
 
@@ -71,11 +72,70 @@ class ErstwhileApp {
     
   } 
 
-  renderDom(ermlDom) {
-    let retval = "";
-    for(let tag in ermlDom) {
-
-    }
+  renderDom(ermlDom ) {
+    let retval = {
+      html: "",
+      scripts: []
+    };
+    // if thisTag is null, this is a top level item. There shouldn't be any attributes.
+    for(let j in ermlDom) {
+      let element = ermlDom;
+      if(Number.isInteger(parseInt(j))) {
+        element = ermlDom[j];
+      }
+      console.log("elt", element, typeof element)
+      if(Array.isArray(element)) {
+        for(let k in element) {
+          let temp = this.renderDom(element[k]);
+          console.log("temp", temp)
+          retval.html += temp.html;
+          retval.scripts = [...retval.scripts, ...temp.scripts];
+        }
+      } else if(typeof element == 'string') {
+        retval.html += element;
+      } else {
+        if(element["#text"]) {
+          retval.html += `${element["#text"]} `; 
+        } else {
+          let attributes = {};
+          if(element[":@"]) {
+            for( let attribute in element[":@"]) {
+              attributes[attribute.substring(2)] = element[":@"][attribute];  
+            }
+          }
+          for(let part in element) {
+            if(part != ':@') {
+              if(this.components[part.toLowerCase()]) {
+                if(!attributes.id) {
+                  attributes.id = `${part.toLowerCase()}-${uuidv4()}`;
+                }
+                retval.html += this.components[part.toLowerCase()].getHtml(attributes, this.ejs.components[part.toLowerCase()], element[part]);
+                retval.scripts.push({ callback: this.components[part.toLowerCase()].initialize, id: attributes.id });
+              } else {
+                function htmlEntities(str) {
+                  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                }
+                let attributeString = "";
+                for(let attribute in attributes) {
+                  attributeString += ` ${attribute}="${htmlEntities(attributes[attribute])}"`;
+                }
+                retval.html += `<${part}${attributeString} ${(element[part].length == 0 ? "/" : "")}>`;
+                if(Array.isArray(element[part])) {
+                  for(let i = 0; i< element[part].length; i++) {
+                    console.log("testing non-component", element[part][i])
+                    let temp = this.renderDom(element[part][i]);
+                    retval.html += temp.html;
+                    retval.scripts = [...retval.scripts, ...temp.scripts];
+                  }
+                }
+                retval.html += `${(element[part].length > 0 ? `</${part}>` : "")}`;
+              }
+            }
+          }
+        }
+      }
+    } 
+    return retval;
   }
 
   openPath(path) {
@@ -96,7 +156,9 @@ class ErstwhileApp {
 
       const parser = new XMLParser({
         ignoreAttributes: false,
-        attributeNamePrefix : "@_"
+        attributeNamePrefix : "@_",
+        alwaysCreateTextNode: true,
+        preserveOrder: true
       });
 
       // 1. set the expected template
@@ -112,20 +174,30 @@ class ErstwhileApp {
           scopes: _this.scopes
         }
 
+        let initsToRun = [];
+        console.log(_this.layout)
         if(_this.newLayoutFlag) {
           let tempMarkup = ejs.render(_this.ejs.layouts[_this.layout], templateVars);
-          let layoutDom = parser.parse(layoutMarkup);
+          let layoutDom = parser.parse(tempMarkup);
 
           let layoutMarkup = _this.renderDom(layoutDom)
+          jquery("#root").html(layoutMarkup.html)
+          initsToRun = [...initsToRun, ...layoutMarkup.scripts]
         }
 
         let thisTemplate = _this.ejs.controllers[found["controller"]][found["action"]];
-        // if(thisTemplate) {
-          let templateMarkup = ejs.render(thisTemplate, templateVars)
-          let templateDom = parser.parse(templateMarkup);
-        // }
 
-        console.log(layoutDom["MainLayout"], templateDom)
+        console.log("this template", thisTemplate, _this.ejs.controllers, found["controller"], found["action"])
+        if(thisTemplate) {
+          let tempMarkup = ejs.render(thisTemplate, templateVars)
+          let templateDom = parser.parse(tempMarkup);
+          let templateMarkup = _this.renderDom(templateDom)
+          console.log("template markup", templateMarkup.html);
+          jquery("#page-content").html(templateMarkup.html)
+          initsToRun = [...initsToRun, ...templateMarkup.scripts]
+        }
+
+        console.log(initsToRun)
       }
       let postPre = function() {
         // 3. Perform the controller action

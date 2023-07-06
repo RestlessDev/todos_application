@@ -20,9 +20,12 @@ class ErstwhileComponent {
     this.ejs = ejs;
   }
 
-  initialize(args, next) {
+  getHtml(args, ejs, innerDom) {
+    return "not implemented";
+  }
+
+  initialize( id ) {
     this.args = args;
-    next()
   }
 
   receiveUpdate(args) {

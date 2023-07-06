@@ -4,6 +4,7 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
 const ErstwhileCompiler = require('./framework/static/ErstwhileCompiler')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: './build/bootstrap.js',
@@ -47,6 +48,10 @@ module.exports = {
     new webpack.ProvidePlugin({
       process: 'process/browser',
     }),
+    new CleanWebpackPlugin( {
+        cleanStaleWebpackAssets: true,
+        protectWebpackAssets: true
+      }),
     // new HtmlWebpackPlugin(),
     /*
     {

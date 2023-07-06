@@ -149,7 +149,7 @@ module.exports = {
       const themeClass = require(`${process.cwd()}/themes/${config.theme}/theme`);
 
       // ensure all of the required libraries are present
-      let requires = themeClass.getRequires(), requiresSuccess = true;
+      let requires = themeClass.getRequires(), requiresSuccess = true, fontFolder = themeClass.getFontFolder(process.cwd());
       for(let i = 0; i < requires.length; i++) {
         try {
           let temp = require(requires[i]);
@@ -214,12 +214,19 @@ module.exports = {
         if(!fs.existsSync(`${process.cwd()}/dist`)) {
           fs.mkdirSync(`${process.cwd()}/dist`);
         }
+        if(fs.existsSync(`${process.cwd()}/app/public`)) {
+          fse.copySync(`${process.cwd()}/app/public`, `${process.cwd()}/dist`, { overwrite: true })
+        }
         if(!fs.existsSync(`${process.cwd()}/dist/assets`)) {
           fs.mkdirSync(`${process.cwd()}/dist/assets`);
         }
         if(!fs.existsSync(`${process.cwd()}/dist/assets/css`)) {
           fs.mkdirSync(`${process.cwd()}/dist/assets/css`);
         }
+        if(!fs.existsSync(`${process.cwd()}/dist/assets/fonts`)) {
+          fs.mkdirSync(`${process.cwd()}/dist/assets/fonts`);
+        }
+        fse.copySync(`${fontFolder}`, `${process.cwd()}/dist/assets/fonts`, { overwrite: true })
         fs.writeFileSync(`${process.cwd()}/dist/assets/css/style.css`, cssFile);
       }
     }
@@ -486,7 +493,7 @@ module.exports = {
             controllerRoutes[controllerKey].routes.sort(routeSort)
             // do the routes
             for(let i in controllerRoutes[controllerKey].routes) {
-              let tempRoute = `${controllerRoutes[controllerKey].base}${controllerRoutes[controllerKey].routes[i].route}`;
+              let tempRoute = `${controllerRoutes[controllerKey].base}${(controllerRoutes[controllerKey].routes[i].route == "" ? "$" : controllerRoutes[controllerKey].routes[i].route)}`;
               let regexVersion = regexifyPath(tempRoute);
               routes[regexVersion] = {controller: controllerKey, action: controllerRoutes[controllerKey].routes[i].action };
             }

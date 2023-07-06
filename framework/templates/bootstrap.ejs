@@ -20,12 +20,12 @@ for(let i in componentList) {
   components[componentList[i].toLowerCase()] = new temp(); 
 }
 
-var App = new AppClass();
+window.App = new AppClass();
 
-App.setRoutes(routes);
-App.setModals(modals);
-App.setComponents(components);
-App.setControllers(controllers);
-App.setEJS(ejs);
+window.App.setRoutes(routes);
+window.App.setModals(modals);
+window.App.setComponents(components);
+window.App.setControllers(controllers);
+window.App.setEJS(ejs);
 
-App.openPath(window.location.pathname);
+window.App.openPath(window.location.pathname);

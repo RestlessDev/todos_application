@@ -14,6 +14,10 @@ class MazerTheme extends ErstwhileTheme {
     ]
   }
 
+  static getFontFolder(appRoot) {
+    return appRoot +'/themes/mazer/theme/fonts';
+  }
+
   static getCSS(appRoot, workingDirectory, themeConfig) {
     const absolutePath = appRoot +'/themes/mazer/theme/scss';
     workingDirectory += '/themeSCSS';

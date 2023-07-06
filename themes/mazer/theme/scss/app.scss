@@ -2,7 +2,7 @@
 @import "./variables";
 
 // Bootstrap + Icons
-$bootstrap-icons-font-src: url('<%- appRoot %>/node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2') format("woff") !default;
+$bootstrap-icons-font-src: url('/assets/fonts/bootstrap-icons.woff2') format("woff") !default;
 @import "<%- appRoot %>/node_modules/bootstrap/scss/bootstrap";
 @import "<%- appRoot %>/node_modules/bootstrap-icons/font/bootstrap-icons";
 

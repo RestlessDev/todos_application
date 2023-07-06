@@ -1,8 +1,11 @@
-<div class="layout-wrapper layout-content-navbar layout-without-menu">
-  <div class="layout-container">
-    <!-- Layout container -->
-    <div class="layout-page">
-      <pagecontent />
-    </div>
+<nav class="navbar navbar-light">
+  <div class="container d-block">
+    <a class="navbar-brand ms-4" href="index.html">
+      <img src="<%= args.logo ? args.logo : "https://restlessdev.com/wp-content/uploads/2019/07/new-restless-logo-black.png" %>" />
+    </a>
   </div>
+</nav>
+
+<div class="container">
+  <div id="page-content"></div>
 </div>

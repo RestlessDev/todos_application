@@ -29,6 +29,7 @@
   "devDependencies": {
     "bootstrap": "5.2.3",
     "bootstrap-icons": "^1.10.5",
+    "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.8.1",
     "fast-xml-parser": "^4.2.5",
     "html-webpack-plugin": "^5.5.3",
@@ -38,6 +39,7 @@
     "perfect-scrollbar": "^1.5.5",
     "process": "^0.11.10",
     "style-loader": "^3.3.3",
+    "uuid": "^9.0.0",
     "watch": "^1.0.2",
     "webpack": "^5.88.0",
     "webpack-cli": "^5.1.4",
