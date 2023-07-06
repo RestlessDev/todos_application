@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm-run-all --parallel styles application webpack",
+    "start": "rm dist/main* || npm-run-all --parallel styles application webpack",
     "build": "NODE_ENV='production' webpack",
     "webpack": "webpack-dev-server",
     "application": "watch 'node framework/bin/erstwhileCLI build application' themes app",
