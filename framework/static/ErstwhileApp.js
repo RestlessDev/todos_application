@@ -83,7 +83,6 @@ class ErstwhileApp {
       if(Number.isInteger(parseInt(j))) {
         element = ermlDom[j];
       }
-      console.log("elt", element, typeof element)
       if(Array.isArray(element)) {
         for(let k in element) {
           let temp = this.renderDom(element[k]);
@@ -122,7 +121,6 @@ class ErstwhileApp {
                 retval.html += `<${part}${attributeString} ${(element[part].length == 0 ? "/" : "")}>`;
                 if(Array.isArray(element[part])) {
                   for(let i = 0; i< element[part].length; i++) {
-                    console.log("testing non-component", element[part][i])
                     let temp = this.renderDom(element[part][i]);
                     retval.html += temp.html;
                     retval.scripts = [...retval.scripts, ...temp.scripts];
