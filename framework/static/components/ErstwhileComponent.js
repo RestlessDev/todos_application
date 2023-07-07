@@ -4,6 +4,8 @@ class ErstwhileComponent {
 
   ejs = false;
 
+  containerFlag = false;
+
   constructor() {
     //do nothing
   }
@@ -16,20 +18,25 @@ class ErstwhileComponent {
     return '';
   }
 
-  setEJS(ejs) {
+  setEjs(ejs) {
     this.ejs = ejs;
   }
 
-  getHtml(args, ejs, innerDom) {
-    return "not implemented";
+  getHtml(args) {
+    if(this.ejs) {
+      let html = ejs.render(this.ejs, {args: args});
+      return html;
+    } else {
+      throw Error("EJS not initialized!")
+    }
   }
 
   initialize( id ) {
-    this.args = args;
+    console.log(`Initializing ${id}`)
   }
 
-  receiveUpdate(args) {
-    this.args = {...this.args, args}
+  receiveUpdate(key, value) {
+    console.log(`Receiving update: ${key} = `, value)
   }
 
   unload() {

@@ -9,9 +9,6 @@ class FullLayout extends ErstwhileLayout {
       'jquery'
     ]
   }
-  getHtml(args, ejsTemplate, innerDom) {
-    return ejs.render(ejsTemplate, {args: args})
-  }
 }
 
 module.exports = FullLayout;

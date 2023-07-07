@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "rm dist/main* || npm-run-all --parallel styles application webpack",
+    "start": "rm dist/main* && npm-run-all --parallel styles application webpack",
     "build": "NODE_ENV='production' webpack",
     "webpack": "webpack-dev-server",
     "application": "watch 'node framework/bin/erstwhileCLI build application' themes app",
@@ -35,6 +35,8 @@
     "html-webpack-plugin": "^5.5.3",
     "jquery": "^3.7.0",
     "npm-run-all": "^4.1.5",
+    "object-resolve-path": "^1.1.1",
+    "observable-slim": "^0.1.6",
     "path-browserify": "^1.0.1",
     "perfect-scrollbar": "^1.5.5",
     "process": "^0.11.10",

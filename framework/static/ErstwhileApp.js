@@ -2,6 +2,8 @@ const jquery = require("jquery");
 const { XMLParser, XMLBuilder, XMLValidator} = require("fast-xml-parser");
 const ejs = require('ejs');
 const { v4: uuidv4 } = require('uuid');
+const ObservableSlim = require('observable-slim');
+const resolvePath = require('object-resolve-path');
 
 class ErstwhileApp {
 
@@ -23,7 +25,7 @@ class ErstwhileApp {
 
   debug = false;
 
-  scopes = {
+  scopesStore = {
     "session": {},
     "page": {},
     "modal": {}
@@ -33,7 +35,68 @@ class ErstwhileApp {
 
   }
 
+  idsToListeners = {
+
+  }
+
   documentObjectModel = {};
+
+  constructor() {
+    /**
+     * Set up the scope proxy object
+     */
+    let _this = this;
+    this.scopes = ObservableSlim.create(this.scopesStore, true, function(changes) {
+      for(let i = 0; i < changes.length; i++) {
+        if(_this.listeners[changes[i].currentPath]) {
+          for(let id in _this.listeners[changes[i].currentPath]) {
+            if(_this.components[id]) {
+              for(let j in _this.listeners[changes[i].currentPath][id]) {
+                _this.components[id].receiveUpdate(_this.listeners[changes[i].currentPath][id][j], changes[i].newValue)
+              }
+            }
+          }
+        }
+      }
+      // console.log(JSON.stringify(changes), _this.template);
+    });
+  }
+
+  registerListener(id, property, key) {
+    let keys = property.split(".")
+    if(keys[0] == "") {
+      keys.shift()
+    }
+    if(keys[0] == 'session' || keys[0] == "page" || keys[0] == "modal") { 
+      if(!this.listeners.hasOwnProperty(property)) {
+        this.listeners[property] = {}
+      }
+      if(!this.listeners[property].hasOwnProperty(id)) {
+        this.listeners[property][id] = []
+      }
+      this.listeners[property][id].push[key];
+      if(!this.idsToListeners.hasOwnProperty(id)) {
+        this.idsToListeners[id] = [];
+      }
+      this.idsToListeners[id].push(property);
+
+      try {
+        return resolvePath(this.scopes, property)
+      } catch(e) {
+        return undefined;
+      }
+
+    } else {
+      throw new Error(`Properties must be session, page, or modal.`)
+    }
+  }
+  
+  removeListeners(id) {
+    for(let i in this.idsToListeners[id]) {
+      delete this.listeners[this.idsToListeners[i]][id];
+    }
+    delete this.idsToListeners[id];
+  }
 
   setLayout(layout) {
     if(this.layout == layout) {
@@ -72,6 +135,15 @@ class ErstwhileApp {
     
   } 
 
+  getComponent(componentName) {
+    if(this.components[componentName.toLowerCase()]) {
+      this.components[componentName.toLowerCase()].setEjs(this.ejs.components[componentName.toLowerCase()]);
+      return this.components[componentName.toLowerCase()];
+    } else {
+      return false;
+    }
+  }
+
   renderDom(ermlDom ) {
     let retval = {
       html: "",
@@ -86,7 +158,6 @@ class ErstwhileApp {
       if(Array.isArray(element)) {
         for(let k in element) {
           let temp = this.renderDom(element[k]);
-          console.log("temp", temp)
           retval.html += temp.html;
           retval.scripts = [...retval.scripts, ...temp.scripts];
         }
@@ -104,11 +175,16 @@ class ErstwhileApp {
           }
           for(let part in element) {
             if(part != ':@') {
-              if(this.components[part.toLowerCase()]) {
+              let component = this.getComponent(part);
+              if(component) {
                 if(!attributes.id) {
                   attributes.id = `${part.toLowerCase()}-${uuidv4()}`;
                 }
-                retval.html += this.components[part.toLowerCase()].getHtml(attributes, this.ejs.components[part.toLowerCase()], element[part]);
+                retval.html += component.getHtml(attributes);
+                if(component.containerFlag) {
+                  let innerHtml = this.renderDom(element[part]);
+
+                }
                 retval.scripts.push({ callback: this.components[part.toLowerCase()].initialize, id: attributes.id });
               } else {
                 function htmlEntities(str) {
@@ -142,7 +218,6 @@ class ErstwhileApp {
       const re = new RegExp(i);
       let matches = path.match(re);
       if(matches) {
-        console.log("found!")
         found = this.routes[i];
       }
     }
@@ -173,7 +248,6 @@ class ErstwhileApp {
         }
 
         let initsToRun = [];
-        console.log(_this.layout)
         if(_this.newLayoutFlag) {
           let tempMarkup = ejs.render(_this.ejs.layouts[_this.layout], templateVars);
           let layoutDom = parser.parse(tempMarkup);
@@ -185,17 +259,19 @@ class ErstwhileApp {
 
         let thisTemplate = _this.ejs.controllers[found["controller"]][found["action"]];
 
-        console.log("this template", thisTemplate, _this.ejs.controllers, found["controller"], found["action"])
         if(thisTemplate) {
           let tempMarkup = ejs.render(thisTemplate, templateVars)
           let templateDom = parser.parse(tempMarkup);
           let templateMarkup = _this.renderDom(templateDom)
-          console.log("template markup", templateMarkup.html);
           jquery("#page-content").html(templateMarkup.html)
           initsToRun = [...initsToRun, ...templateMarkup.scripts]
         }
 
-        console.log(initsToRun)
+        if(initsToRun.length > 0) {
+          for(let i in initsToRun) {
+            initsToRun[i].callback(initsToRun[i].id);
+          }
+        }
       }
       let postPre = function() {
         // 3. Perform the controller action

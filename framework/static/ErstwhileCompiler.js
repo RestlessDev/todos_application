@@ -552,7 +552,9 @@ module.exports = {
         });
         fs.writeFileSync(`${process.cwd()}/build/bootstrap.js`, bootstrapFile);
 
-
+        // clear up old main.js
+        let regex = /^main.([a-zA-Z0-9]+).(hot-update.js|hot-update.json)$/
+        fs.readdirSync(`${process.cwd()}/dist`).filter(f => regex.test(f)).map(f => fs.unlinkSync(path + '/' + f))
       }
     }
   }
