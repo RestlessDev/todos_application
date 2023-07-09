@@ -1,3 +1,15 @@
-<div>
-  <h2>Login</h2>
+<div class="row">
+  <div class="col-lg-6 col-md-8 offset-3">
+    <Card>
+      <div class="row">
+        <h2 class="pb-2">Login</h2>
+        <hr />
+        <Form id="login-form" >
+          <EmailInput name="email" label="Email Address" />
+          <PasswordInput name="password" label="Password" />
+          <Button color="primary" onclick="@.page.submitForm">Login</Button>
+        </form>
+      </div>
+    </Card>
+  </div>
 </div>

@@ -2,7 +2,11 @@ const ErstwhileController = require("../../framework/static/controllers/Erstwhil
 
 class IndexController extends ErstwhileController {
   loginAction(args) {
-    console.log("login!")
+    window.App.scopes.page.submitForm = function() {
+      let values = window.App.getComponent("login-form").getValues();
+      console.log(values);
+      return false;
+    }
   }
 
   signupAction(args) {

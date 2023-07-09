@@ -1,0 +1,9 @@
+<div class="form-group">
+  <% if(args.label) { %><label for="<%- args.id %>-field"><%= args.label %></label><% } %>
+  <input type="password" id="<%- args.id %>-field" class="form-control" placeholder="<% if(args.label) { %><%= args.label %><% } %>" autocomplete="off">
+  <% if(args.helpText) { %>
+  <p>
+    <small class="text-muted"><%= args.helpText %></small>
+  </p>
+  <% } %>
+</div>

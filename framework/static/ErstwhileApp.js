@@ -1,5 +1,5 @@
 const jquery = require("jquery");
-const { XMLParser, XMLBuilder, XMLValidator} = require("fast-xml-parser");
+const { XMLParser } = require("fast-xml-parser");
 const ejs = require('ejs');
 const { v4: uuidv4 } = require('uuid');
 const ObservableSlim = require('observable-slim');
@@ -65,6 +65,7 @@ class ErstwhileApp {
   }
 
   registerListener(id, property, key) {
+    console.log(id, property, key)
     let keys = property.split(".")
     if(keys[0] == "") {
       keys.shift()
@@ -141,6 +142,16 @@ class ErstwhileApp {
     if(this.componentClasses[componentName.toLowerCase()]) {
       this.componentClasses[componentName.toLowerCase()].setEjs(this.ejs.components[componentName.toLowerCase()]);
       return this.componentClasses[componentName.toLowerCase()];
+    } else {
+      return false;
+    }
+  }
+
+  getComponent(id) {
+    if(this.components.layout[id]) {
+      return this.components.layout[id];
+    } else if(this.components.page[id]) {
+      return this.components.page[id];
     } else {
       return false;
     }
@@ -227,17 +238,19 @@ class ErstwhileApp {
                   
                   retval.components[attributes.id] = component;
 
-                  if(!component.containerFlag) {
+                  if(!component.isContainer()) {
                     retval.scripts.push({ id: component.id });
                   } else { 
                     let innerItem = this.renderDom(element[part]);
-                    jquery(`#${attributes.id} .erstwhile-container-inner`).replaceWith(innerItem.html);
+                    console.log(innerItem)
                     retval.components = {...retval.components, ...innerItem.components}
                     retval.scopedAttributes = [...retval.scopedAttributes, innerItem.scopedAttributes]
+                    retval.scripts.push({func: function() {
+                      jquery(`#${attributes.id} .erstwhile-container-inner`).replaceWith(innerItem.html);
+                    }})
                     retval.scripts = [...retval.scripts, ...innerItem.scripts];
                     retval.scripts.push({ id: component.id });
                   } 
-                  console.log(retval.scripts)
                 } else {
                   function htmlEntities(str) {
                     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -349,17 +362,20 @@ class ErstwhileApp {
 
         if(initsToRun.length > 0) {
           for(let i in initsToRun) {
-            console.log("inits", initsToRun[i])
-            if(_this.components.layout[initsToRun[i]]) {
-              _this.components.layout[initsToRun[i]].initialize();
-            } else if(_this.components.page[initsToRun[i]]) {
-              _this.components.page[initsToRun[i]].initialize();
+            if(initsToRun[i].func) {
+              initsToRun[i].func();
+            } else {
+              let component = _this.getComponent(initsToRun[i].id);
+              if(component) {
+                component.initialize();
+              }
             }
           }
         }
         if(scopedAttributes.length > 0) {
           for(let i in scopedAttributes) {
-            _this.registerListener(scopedAttributes[i].id,scopedAttributes[i].property,scopedAttributes[i].key)
+            if(scopedAttributes[i].id && scopedAttributes[i].property && scopedAttributes[i].key) 
+              _this.registerListener(scopedAttributes[i].id,scopedAttributes[i].property,scopedAttributes[i].key)
           }
         }
       }
@@ -377,6 +393,14 @@ class ErstwhileApp {
     }
   }
 
+  redirect(path, updateHistory = true) {
+    if(path !== window.location.pathname) {
+      if(updateHistory) {
+        pushState({}, '', path);
+      }
+      this.openPath(path);
+    }
+  }
 }
 
 module.exports = ErstwhileApp;

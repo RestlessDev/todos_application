@@ -442,7 +442,6 @@ module.exports = {
                       if(!ejsObj.controllers[controllerName]) {
                         ejsObj.controllers[controllerName] = {}
                       }
-                      console.log("ejs", `${process.cwd()}/app`, controllerName, tempMethod)
                       ejsObj.controllers[controllerName][tempMethod] = precompileActionEJS(`${process.cwd()}/app`, controllerName, tempMethod);
                     }
                   }
