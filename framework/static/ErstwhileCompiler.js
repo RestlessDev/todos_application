@@ -295,7 +295,7 @@ module.exports = {
             fs.existsSync(`${process.cwd()}/themes/${config.theme}/${componentDirectories[i]}/component.js`)) {
             componentClasses[componentDirectories[i].toLowerCase()] = require(`${process.cwd()}/themes/${config.theme}/${componentDirectories[i]}/component`);
             properComponentNames[componentDirectories[i].toLowerCase()] = componentDirectories[i];
-            let temp = new componentClasses[componentDirectories[i].toLowerCase()]();
+            let temp = new componentClasses[componentDirectories[i].toLowerCase()]("temp", {});
             if(!(temp instanceof ErstwhileComponent)) {
               console.log(`Notice: Component ${componentDirectories[i]} in theme does not seem to be valid. Skipped.`)
               delete componentClasses[componentDirectories[i].toLowerCase()];
@@ -554,7 +554,7 @@ module.exports = {
 
         // clear up old main.js
         let regex = /^main.([a-zA-Z0-9]+).(hot-update.js|hot-update.json)$/
-        fs.readdirSync(`${process.cwd()}/dist`).filter(f => regex.test(f)).map(f => fs.unlinkSync(path + '/' + f))
+        fs.readdirSync(`${process.cwd()}/dist`).filter(f => regex.test(f)).map(f => fs.unlinkSync(`${process.cwd()}/dist` + '/' + f))
       }
     }
   }

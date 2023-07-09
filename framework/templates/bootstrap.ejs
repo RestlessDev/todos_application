@@ -6,7 +6,7 @@ let ejs = <%- ejs %>;
 let componentList = <%- componentList %>;
 let controllerList = <%- controllerList %>;
 let controllers = {};
-let components = {};
+let componentClasses = {};
 
 // we need to require and instantiate all of the controllers
 for(let i in controllerList) {
@@ -17,14 +17,14 @@ for(let i in controllerList) {
 // we need to require and instantiate all of the controllers
 for(let i in componentList) {
   let temp = require(`./components/${componentList[i]}/component`);
-  components[componentList[i].toLowerCase()] = new temp(); 
+  componentClasses[componentList[i].toLowerCase()] = temp; 
 }
 
 window.App = new AppClass();
 
 window.App.setRoutes(routes);
 window.App.setModals(modals);
-window.App.setComponents(components);
+window.App.setComponentClasses(componentClasses);
 window.App.setControllers(controllers);
 window.App.setEJS(ejs);
 

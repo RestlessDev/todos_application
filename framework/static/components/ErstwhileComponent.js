@@ -2,12 +2,18 @@ class ErstwhileComponent {
 
   args = {}
 
-  ejs = false;
+  static ejs = false;
 
   containerFlag = false;
 
-  constructor() {
-    //do nothing
+  id = false; 
+
+  constructor(id, args) {
+    this.id = id;
+    if(args.id) {
+      delete args.id;
+    }
+    this.args = args;
   }
 
   getRequires() {
@@ -18,21 +24,29 @@ class ErstwhileComponent {
     return '';
   }
 
-  setEjs(ejs) {
+  static setEjs(ejs) {
     this.ejs = ejs;
   }
 
-  getHtml(args) {
-    if(this.ejs) {
-      let html = ejs.render(this.ejs, {args: args});
-      return html;
+  getHtml(innerDom) {
+    if(this.constructor.ejs) {
+      let html = ejs.render(this.constructor.ejs, {args: this.args});
+      
+      function htmlEntities(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+      let attributeString = "";
+      for(let attribute in this.args) {
+        attributeString += ` ${attribute}="${htmlEntities(this.args[attribute])}"`;
+      }
+      return `<div id=${this.id}${attributeString}>${html}</div>`;
     } else {
       throw Error("EJS not initialized!")
     }
   }
 
-  initialize( id ) {
-    console.log(`Initializing ${id}`)
+  initialize( ) {
+    console.log(`Initializing ${this.id}`) 
   }
 
   receiveUpdate(key, value) {
