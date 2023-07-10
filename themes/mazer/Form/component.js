@@ -12,6 +12,8 @@ class Form extends ErstwhileForm {
   }
   prepareAttributes() {
     let attributes = {...this.args};
+    this.prepareGlobalAttributes(attributes);
+    
     attributes.onsubmit = "return false;"
     return attributes;
   }

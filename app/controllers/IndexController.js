@@ -3,8 +3,30 @@ const ErstwhileController = require("../../framework/static/controllers/Erstwhil
 class IndexController extends ErstwhileController {
   loginAction(args) {
     window.App.scopes.page.submitForm = function() {
-      let values = window.App.getComponent("login-form").getValues();
-      console.log(values);
+      window.App.getComponent("login-alert").hide();
+      let formValues = window.App.getComponent("login-form").getValues();
+      let model = window.App.getModel('Authentication');
+      model.login(formValues).then(function(response) {
+        console.log("response", response)
+        if(response.data.success) {
+          model.currentUser().then(function(response) {
+            window.App.scopes.session.user = response;
+            let queryParams = new URLSearchParams(location.search);;
+            if(queryParams.redirect) {
+              window.App.redirect(queryParams.redirect)
+            } else {
+              window.App.redirect("/todos/list")
+            }
+          }).catch(function(e) {
+            console.log(e)
+          });
+        } else {
+          console.log("fail")
+          window.App.getComponent("login-alert").show();
+        }
+      }).catch(function(e) {
+        console.log("error", e)
+      });
       return false;
     }
   }
@@ -14,24 +36,11 @@ class IndexController extends ErstwhileController {
   }
 
   indexAction(args) {
-    console.log("index!")
-    let phrases = [
-      "Is this thing on?",
-      "Waiting for the end of the world.",
-      "Less than zero.",
-      "Romeo is restless",
-      "Sneaky feelings",
-      "This modern world.",
-      "Blame it on Cain.",
-      "Welcome to the weinerschitzel.",
-      "Welcome to the working week",
-      "Radio, Radio.",
-      "Watching the detectives."
-    ]
-    window.App.scopes.page.phrase = phrases[0];
-    setInterval(function() {
-      window.App.scopes.page.phrase = phrases[Math.floor(Math.random() * 11)]; 
-    }, 5000)
+    if(window.localStorage.erstwhileSessionKey) {
+      window.App.redirect("/todos/list")
+    } else {
+      window.App.redirect("/login")
+    }
   }
 }
 

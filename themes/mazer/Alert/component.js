@@ -3,7 +3,9 @@ const ErstwhileComponent = require('../../../framework/static/components/Erstwhi
 const ejs = require('ejs');
 const jquery = require("jquery")
 
-class Button extends ErstwhileComponent {
+class Alert extends ErstwhileComponent {
+  message = "";
+
   isContainer() {
     return true;
   }
@@ -13,34 +15,26 @@ class Button extends ErstwhileComponent {
       value: jquery(`#${this.id}-field`).val() 
     }
   }
-  getTag() {
-    return 'button';
-  }
   prepareAttributes() {
     let attributes = {...this.args};
     this.prepareGlobalAttributes(attributes);
-    
     if(!attributes.class) {
       attributes.class = "";
     }
-    attributes.class += "btn";
-    if(attributes.outline == "true" && attributes.color) {
-      attributes.class += ` btn-outline-${attributes.color}`;
+    attributes.class += " alert";
+    if(attributes.light == "true" && attributes.color) {
+      attributes.class += ` alert-light-${attributes.color}`;
     } else if(attributes.color) {
-      attributes.class += ` btn-${attributes.color}`;
+      attributes.class += ` alert-${attributes.color}`;
     }
-    if(attributes.size) {
-      attributes.class += ` btn-${attributes.size}`;
-    }
-    if(attributes.rounded == "true") {
-      attributes.class += ` rounded-pill`;
+    if(attributes.dismissable == "true") {
+      attributes.class += ` alert-dismissable fade show`;
     }
     delete attributes.color;
-    delete attributes.size;
-    delete attributes.outline;
-    delete attributes.rounded;
+    delete attributes.light;
+    delete attributes.dismissable;
     return attributes;
   }
 }
 
-module.exports = Button;
+module.exports = Alert;

@@ -7,6 +7,8 @@ let componentList = <%- componentList %>;
 let controllerList = <%- controllerList %>;
 let controllers = {};
 let componentClasses = {};
+let models = require("./models/models");
+let config = require("./config/app");
 
 // we need to require and instantiate all of the controllers
 for(let i in controllerList) {
@@ -24,6 +26,8 @@ window.App = new AppClass();
 
 window.App.setRoutes(routes);
 window.App.setModals(modals);
+window.App.setConfig(config);
+window.App.setModels(models);
 window.App.setComponentClasses(componentClasses);
 window.App.setControllers(controllers);
 window.App.setEJS(ejs);

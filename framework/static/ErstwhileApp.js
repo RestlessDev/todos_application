@@ -15,6 +15,8 @@ class ErstwhileApp {
 
   ejs = false;
 
+  config = false;
+
   componentClasses = false;
 
   layout = "default";
@@ -36,6 +38,8 @@ class ErstwhileApp {
   listeners = {};
 
   idsToListeners = {};
+
+  models = {};
 
   components = {
     "layout" :{},
@@ -65,7 +69,7 @@ class ErstwhileApp {
   }
 
   registerListener(id, property, key) {
-    console.log(id, property, key)
+    console.log("registering listener", id, property, key)
     let keys = property.split(".")
     if(keys[0] == "") {
       keys.shift()
@@ -108,7 +112,7 @@ class ErstwhileApp {
       this.layout = layout;
       this.newLayoutFlag = true;
     } else {
-      if(this.debug) {
+      if(this.getDebug()) {
         console.log(`Notice: Invalid layout "${layout}"`)
       }
     }
@@ -116,6 +120,14 @@ class ErstwhileApp {
 
   setComponentClasses(componentClasses) {
     this.componentClasses = componentClasses;
+  }
+
+  setModels(models) {
+    this.models = models;
+  }
+
+  setConfig(config) {
+    this.config = config;
   }
 
   setRoutes(routes) {
@@ -138,6 +150,9 @@ class ErstwhileApp {
     
   } 
 
+  getDebug() {
+    return this.getConfig("debug") == true;
+  }
   getComponentClass(componentName) {
     if(this.componentClasses[componentName.toLowerCase()]) {
       this.componentClasses[componentName.toLowerCase()].setEjs(this.ejs.components[componentName.toLowerCase()]);
@@ -153,6 +168,22 @@ class ErstwhileApp {
     } else if(this.components.page[id]) {
       return this.components.page[id];
     } else {
+      return false;
+    }
+  }
+
+  getConfig(property) {
+    if(this.config[property]) {
+      return this.config[property];
+    } 
+    return null;
+  }
+
+  getModel(model) {
+    if(this.models[model]) {
+      return this.models[model];
+    } else {  c
+      console.log(`Notice: Model "${model}" not found.`)
       return false;
     }
   }
@@ -232,8 +263,12 @@ class ErstwhileApp {
                     for(let k = 0; k < theseScopedAttributes.length; k++) {
                       attributes[theseScopedAttributes[k]["key"]] = theseScopedAttributes[k]["initialValue"];
                     }
-                    retval.scopedAttributes = [...retval.scopedAttributes, ...theseScopedAttributes]
+                    // retval.scopedAttributes = [...retval.scopedAttributes, ...theseScopedAttributes]
+                    for(let j in theseScopedAttributes) {
+                      retval.scopedAttributes.push(theseScopedAttributes[j])
+                    }
                   }
+                  console.log("scoped attributes", retval.scopedAttributes)
                   retval.html += component.getHtml(element[part]);
                   
                   retval.components[attributes.id] = component;
@@ -242,9 +277,11 @@ class ErstwhileApp {
                     retval.scripts.push({ id: component.id });
                   } else { 
                     let innerItem = this.renderDom(element[part]);
-                    console.log(innerItem)
                     retval.components = {...retval.components, ...innerItem.components}
-                    retval.scopedAttributes = [...retval.scopedAttributes, innerItem.scopedAttributes]
+                    for(let j in innerItem.scopedAttributes) {
+                      retval.scopedAttributes.push(innerItem.scopedAttributes[j])
+                    }
+                    // retval.scopedAttributes = [...retval.scopedAttributes, innerItem.scopedAttributes]
                     retval.scripts.push({func: function() {
                       jquery(`#${attributes.id} .erstwhile-container-inner`).replaceWith(innerItem.html);
                     }})
@@ -265,7 +302,10 @@ class ErstwhileApp {
                       let temp = this.renderDom(element[part][i]);
                       retval.html += temp.html;
                       retval.scripts = [...retval.scripts, ...temp.scripts];
-                      retval.scopedAttributes = [...retval.scopedAttributes, ...temp.scopedAttributes]; 
+                      for(let j in temp.scopedAttributes) {
+                        retval.scopedAttributes.push(temp.scopedAttributes[j])
+                      }
+                      // retval.scopedAttributes = [...retval.scopedAttributes, ...temp.scopedAttributes]; 
                       retval.components = {...retval.components, ...temp.components}
                     }
                   }
@@ -277,6 +317,7 @@ class ErstwhileApp {
         }
       }
     } 
+    // console.log("before return", retval.scopedAttributes)
     return retval;
   }
 
@@ -314,7 +355,7 @@ class ErstwhileApp {
          */
         // 5. Set the variables to be used at the ejs layer
         let templateVars = {
-          scopes: _this.scopes
+          scopes: _this.scopesStore
         }
 
         let initsToRun = [];
@@ -396,9 +437,9 @@ class ErstwhileApp {
   redirect(path, updateHistory = true) {
     if(path !== window.location.pathname) {
       if(updateHistory) {
-        pushState({}, '', path);
+        // History.pushState({}, '', path);
       }
-      this.openPath(path);
+      document.location = path;
     }
   }
 }

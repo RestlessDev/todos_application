@@ -5,6 +5,8 @@ class ErstwhileModel {
   constructor(params) {
     //do nothing
   }
+
+
   static populateParams(path, params) {
     const pathParts = path.split('/');
     let output = '/';
@@ -26,7 +28,7 @@ class ErstwhileModel {
   static async makeRequest(path, params, method = 'get', data, headers) {
     try {
       let axiosConfig = {
-        url: App.config.baseURL + this.populateParams(path, params),
+        url: window.App.getConfig('baseUrl') + this.populateParams(path, params),
         method
       }
       if(headers) {

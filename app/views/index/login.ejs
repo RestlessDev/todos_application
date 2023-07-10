@@ -4,8 +4,9 @@
       <div class="row">
         <h2 class="pb-2">Login</h2>
         <hr />
+        <Alert id="login-alert" color="danger" light="true" dismissible="true" hidden="true">The username/password combination entered doesn't match.</Alert>
         <Form id="login-form" >
-          <EmailInput name="email" label="Email Address" />
+          <EmailInput name="username" label="Username/Email Address" />
           <PasswordInput name="password" label="Password" />
           <Button color="primary" onclick="@.page.submitForm">Login</Button>
         </form>

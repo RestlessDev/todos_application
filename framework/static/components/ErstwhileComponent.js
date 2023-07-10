@@ -1,5 +1,6 @@
 const { XMLParser } = require("fast-xml-parser");
 const resolvePath = require('object-resolve-path');
+const jquery = require("jquery")
 
 class ErstwhileComponent {
 
@@ -9,19 +10,61 @@ class ErstwhileComponent {
 
   id = false; 
 
+  hidden = false;
+
   constructor(id, args) {
     this.id = id;
     this.args = args;
+    this.hidden = args.hidden;
   }
+
+  innerDom = false;
 
   getRequires() {
     return [];
   }
 
+  isHidden() {
+    return this.hidden;
+  }
+
+  hide() {
+    this.hidden = true;
+    jquery(`#${this.id}`).addClass("d-none");
+  }
+
+  show() {
+    this.hidden = false;
+    jquery(`#${this.id}`).removeClass("d-none");
+  }
+
+  setProperty(property, value) {
+    this.args[property] = value;
+  }
+
+  getProperty(property) {
+    return this.args[property];
+  }
+
   prepareAttributes() {
     let attributes = {...this.args};
-    this.inlineScopedFunctions(attributes)
+    this.prepareGlobalAttributes(attributes);
     return attributes;
+  }
+
+  prepareGlobalAttributes(attributes) {
+    this.inlineScopedFunctions(attributes);
+    if(this.isHidden()) {
+      if(!attributes.class) {
+        attributes.class = "d-none";
+      } 
+    } else {
+      if(attributes.class && attributes.class.indexOf('d-none') >= 0) {
+        attributes.class = attributes.class.replace(/d-none/, '');
+      }
+    }
+    delete attributes.hidden;
+    return attributes
   }
 
   inlineScopedFunctions(attributes) {
@@ -50,6 +93,15 @@ class ErstwhileComponent {
   }
 
   getHtml(innerDom) {
+    this.innerDom = innerDom;
+    if(this.constructor.ejs) {
+      return this.render(false);
+    } else {
+      return "";
+    }
+  }
+
+  render(replace = true) {
     if(this.constructor.ejs) {
       let html = ejs.render(this.constructor.ejs, {args: this.args});
       
@@ -65,9 +117,15 @@ class ErstwhileComponent {
       for(let attribute in attributes) {
         attributeString += ` ${attribute}="${htmlEntities(attributes[attribute])}"`;
       }
-      return `<${this.getTag() ? this.getTag() : 'div'} id=${this.id}${attributeString}>${html}</${this.getTag() ? this.getTag() : 'div'}>`;
+      let returnVal = `<${this.getTag() ? this.getTag() : 'div'} id=${this.id}${attributeString}>${html}</${this.getTag() ? this.getTag() : 'div'}>`;
+      if(replace) {
+        jquery(`#${this.id}`).replaceWith(returnVal);
+        return true;
+      } else {
+        return returnVal
+      } 
     } else {
-      throw Error("EJS not initialized!")
+      return true;
     }
   }
 
@@ -76,7 +134,20 @@ class ErstwhileComponent {
   }
 
   receiveUpdate(key, value) {
-    console.log(`Receiving update: ${key} = `, value)
+    this.receiveGlobalUpdates(key, value);
+  }
+
+  receiveGlobalUpdates(key, value) {
+    if(key == "hidden") {
+      if(value) {
+        this.hide()
+      } else {
+        this.show()
+      }
+    }
+    // if(window.App.getDebug()) {
+      console.log(`Notice: Receiving global update: ${key} = ${JSON.stringify(value)} `)
+    // }
   }
 
   unload() {
