@@ -3,8 +3,14 @@ const resolvePath = require('object-resolve-path');
 const jquery = require("jquery")
 
 class ErstwhileComponent {
+  static events = ['blur','change','focus','focusin','select','submit','keydown','keypress','keyup','focusout','click','dblclick','focusout','hover','mousedown','mouseenter','mouseleave','mousemove','mouseout','mouseover','mouseup'];
+  args = {};
 
-  args = {}
+  argsToFilter = [];
+
+  eventsToBind = {
+
+  }
 
   static ejs = false;
 
@@ -12,10 +18,33 @@ class ErstwhileComponent {
 
   hidden = false;
 
+  bindEventsTest = true;
+
   constructor(id, args) {
     this.id = id;
-    this.args = args;
-    this.hidden = args.hidden;
+    let params = {};
+    
+    for(let key in args) {
+      if(args[key].startsWith("@.")) {
+        params[key] = resolvePath(window.App.scopesStore, args[key].substring(2)) || '';
+        this.argsToFilter.push(key)
+        if(key.startsWith('on')) {
+          if(this.constructor.events.indexOf(key.substring(2).toLowerCase()) >= 0) {
+            this.eventsToBind[key.substring(2).toLowerCase()] = params[key];
+          }
+        }
+      } else {
+        params[key] = args[key];
+      }
+      
+    }
+    this.args = params;
+    if(args.hidden) {
+      this.hidden = args.hidden;
+    }
+    if(args.bindEvents) {
+      this.bindEventsTest = args.bindEvents;
+    }
   }
 
   innerDom = false;
@@ -36,6 +65,10 @@ class ErstwhileComponent {
   show() {
     this.hidden = false;
     jquery(`#${this.id}`).removeClass("d-none");
+  }
+
+  willBindEvents() {
+    return this.bindEventsTest;
   }
 
   setProperty(property, value) {
@@ -68,13 +101,23 @@ class ErstwhileComponent {
   }
 
   inlineScopedFunctions(attributes) {
+    /*
     for(let attribute in attributes) {
       let value = attributes[attribute];
       if(value.startsWith("@.")) {
         let obj = resolvePath(window.App.scopesStore, value.substring(2));
         if(typeof obj == 'function') {
           attributes[attribute] = `(${(obj.toString())})(); return false;`
+        } else {
+          this.setProperty(attribute, obj)
+          delete attributes[attribute];
         }
+      }
+    }
+    */
+    for(let i in this.argsToFilter) {
+      if(attributes[this.argsToFilter[i]]) {
+        delete attributes[this.argsToFilter[i]];
       }
     }
     return attributes;
@@ -145,9 +188,16 @@ class ErstwhileComponent {
         this.show()
       }
     }
-    // if(window.App.getDebug()) {
+    if(key.toLowerCase() == "bindevents") {
+      if(value) {
+        this.bindEventsTest = true;
+      } else {
+        this.bindEventsTest = false;
+      }
+    }
+    if(window.App.getDebug()) {
       console.log(`Notice: Receiving global update: ${key} = ${JSON.stringify(value)} `)
-    // }
+    }
   }
 
   unload() {
@@ -156,6 +206,12 @@ class ErstwhileComponent {
 
   getTag() {
     return false;
+  }
+
+  bindEvents() {
+    for(let event in this.eventsToBind) {
+      jquery(`#${this.id}`).on(event, this.eventsToBind[event])
+    }
   }
 }
 

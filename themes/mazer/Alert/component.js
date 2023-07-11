@@ -9,12 +9,6 @@ class Alert extends ErstwhileComponent {
   isContainer() {
     return true;
   }
-  getValue() {
-    return {
-      key: this.args.name ? this.args.name : this.id,
-      value: jquery(`#${this.id}-field`).val() 
-    }
-  }
   prepareAttributes() {
     let attributes = {...this.args};
     this.prepareGlobalAttributes(attributes);

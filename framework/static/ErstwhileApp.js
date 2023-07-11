@@ -66,6 +66,30 @@ class ErstwhileApp {
       }
       // console.log(JSON.stringify(changes), _this.template);
     });
+
+    // fix anchors
+    jquery('body').on('click', 'a', function(e) {
+      if(!jquery(this).hasClass('external')) {
+        let href = jquery(this).attr('href');
+        if(href &&
+          !href.startsWith('#') &&
+          !href.startsWith('http://') &&
+          !href.startsWith('https://') &&
+          !href.startsWith('mailto:') &&
+          !href.startsWith('tel:') 
+          ) {
+            e.preventDefault();
+            e.stopPropagation()
+            window.App.redirect(href);
+          }
+      }
+    })
+
+    // add popstate handler
+    window.addEventListener("popstate", (event) => {
+      console.log(window.location)
+      window.App.openPath(`${window.location.pathname}${window.location.search}${window.location.hash}`);
+    });
   }
 
   registerListener(id, property, key) {
@@ -100,14 +124,16 @@ class ErstwhileApp {
   
   removeListeners(id) {
     for(let i in this.idsToListeners[id]) {
-      delete this.listeners[this.idsToListeners[i]][id];
+      if(this.listeners[this.idsToListeners[id][i]] && this.listeners[this.idsToListeners[id][i]][id]) {
+        delete this.listeners[this.idsToListeners[id][i]][id];
+      }
     }
     delete this.idsToListeners[id];
   }
 
   setLayout(layout) {
     if(this.layout == layout) {
-      // do nothing
+      this.newLayoutFlag = false;
     } else if(this.ejs.layouts[layout]) {
       this.layout = layout;
       this.newLayoutFlag = true;
@@ -362,6 +388,9 @@ class ErstwhileApp {
         let scopedAttributes = [];
         let newLayoutComponents = false;
         let newPageComponents = false;
+        
+        console.log("new layoutflag", _this.newLayoutFlag)
+
         if(_this.newLayoutFlag) {
           let tempMarkup = ejs.render(_this.ejs.layouts[_this.layout], templateVars);
           let layoutDom = parser.parse(tempMarkup);
@@ -389,7 +418,7 @@ class ErstwhileApp {
         if(newLayoutComponents) {
           for(let id in _this.components.layout) {
             _this.removeListeners(id);
-            this.components.layout[id].unload();
+            _this.components.layout[id].unload();
           }
           _this.components.layout = newLayoutComponents;
         }
@@ -409,6 +438,10 @@ class ErstwhileApp {
               let component = _this.getComponent(initsToRun[i].id);
               if(component) {
                 component.initialize();
+                console.log("y no binds", component)
+                if(component.willBindEvents()) {
+                  component.bindEvents();
+                }
               }
             }
           }
@@ -437,9 +470,9 @@ class ErstwhileApp {
   redirect(path, updateHistory = true) {
     if(path !== window.location.pathname) {
       if(updateHistory) {
-        // History.pushState({}, '', path);
+        history.pushState({}, '', path);
       }
-      document.location = path;
+      this.openPath(path)
     }
   }
 }

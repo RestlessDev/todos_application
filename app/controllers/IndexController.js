@@ -7,10 +7,9 @@ class IndexController extends ErstwhileController {
       let formValues = window.App.getComponent("login-form").getValues();
       let model = window.App.getModel('Authentication');
       model.login(formValues).then(function(response) {
-        console.log("response", response)
         if(response.data.success) {
           model.currentUser().then(function(response) {
-            window.App.scopes.session.user = response;
+            window.App.scopes.session.user = response.data;
             let queryParams = new URLSearchParams(location.search);;
             if(queryParams.redirect) {
               window.App.redirect(queryParams.redirect)
@@ -21,7 +20,6 @@ class IndexController extends ErstwhileController {
             console.log(e)
           });
         } else {
-          console.log("fail")
           window.App.getComponent("login-alert").show();
         }
       }).catch(function(e) {
