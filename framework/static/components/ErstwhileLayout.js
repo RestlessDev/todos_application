@@ -1,5 +1,4 @@
-let App = require("../../base/App");
-let ErstwhileComponent = require('./ErstwhileComponent')
+const ErstwhileComponent = require('./ErstwhileComponent')
 
 class ErstwhileLayout extends ErstwhileComponent {
 

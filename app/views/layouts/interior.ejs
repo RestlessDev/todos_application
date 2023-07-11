@@ -1,9 +1,13 @@
 <FullLayout 
   logo="/assets/images/todos-logo.png" 
   sidebarMenu="@.session.sidebarMenu"
-  sidebarMenuActive="@.page.sidebarMenuActive">
-  <p>
-    What I don't <i>understand</i>, Charlie, is what you're trying to say to me.
-  </p>
+  sidebarMenuActive="@.page.sidebarMenuActive"
+  breadcrumbs="@.page.breadcrumbs"
+  copyrightYear="<%= (new Date()).getFullYear() %>"
+  copyrightName="<a class='external' target='_blank' href='https://www.restlessdev.com'>RestlessDev</a>"
+  footerMessage="Made with <span class='text-danger'><i class='bi bi-heart-fill icon-mid'></i></span> in New Orleans"
+  pageTitle="@.page.title"
+  pageIntro="@.page.intro"
+  >
   <pagecontent />
 </FullLayout>

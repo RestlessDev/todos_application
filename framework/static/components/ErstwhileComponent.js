@@ -1,6 +1,6 @@
 const { XMLParser } = require("fast-xml-parser");
 const resolvePath = require('object-resolve-path');
-const jquery = require("jquery")
+const jquery = require("jquery");
 
 class ErstwhileComponent {
   static events = ['blur','change','focus','focusin','select','submit','keydown','keypress','keyup','focusout','click','dblclick','focusout','hover','mousedown','mouseenter','mouseleave','mousemove','mouseout','mouseover','mouseup'];
@@ -152,6 +152,21 @@ class ErstwhileComponent {
         // not ideal
         html = html.replace(/<innerContent \/>/ig, '<div class="erstwhile-container-inner"></div>')
       }
+      /**
+       * Here we're trying to figure out if this object is a Layout, so
+       * we know to look for the <pagecontent /> tag. it's a little
+       * hacky and won't work more than one subclass deep.
+       */
+      let protoClass = null;
+      try{
+        protoClass = this.__proto__.__proto__.constructor.name; 
+      } catch(e) {
+        // don't sweat it
+      }
+      if(protoClass == "ErstwhileLayout") {
+        html = html.replace(/<pagecontent \/>/ig, '<div id="page-content"></div>')
+      }
+      /* /end hackiness */
       function htmlEntities(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
       }

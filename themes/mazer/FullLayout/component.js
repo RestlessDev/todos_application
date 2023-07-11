@@ -19,9 +19,26 @@ class FullLayout extends ErstwhileLayout {
     } else if(key.toLowerCase() == "sidebarmenuactive") {
       jquery(`#${this.id} .sidebar-menu .menu .active`).removeClass('active');
       jquery(`#sidebar-menu-${value}`).addClass('active');
+    } else if(key.toLowerCase() == "breadcrumbs") {
+      this.renderBreadcrumbs(value)
+    } else if(key.toLowerCase() == "pagetitle") {
+      jquery(`#page-title`).html(value)
+    } else if(key.toLowerCase() == "pageintro") {
+      jquery(`#page-intro`).html(value)
     }
-
     this.receiveGlobalUpdates(key, value);
+  }
+
+  renderBreadcrumbs(value) {
+    let html = `<ol class="breadcrumb">`;
+    for(let i in value) {
+      html += `<li class="breadcrumb-item ${(i == value.length - 1 ? 'active' : "")}" ${(i == value.length - 1 ? 'aria-current="page"' : "")}>
+        ${(value[i].link ?
+          `<a href="${value[i].link}">${value[i].label}</a>` :
+          `${value[i].label}`)}</li>`
+    }
+    html += `</ol>`;
+    jquery(`#${this.id} #breadcrumb-container`).html(html);
   }
 
   renderSidebar(value) {

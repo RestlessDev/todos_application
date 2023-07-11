@@ -25,7 +25,7 @@ class ErstwhileControl extends ErstwhileComponent {
   }
 
   unload() {
-    let formComponent = window.App.getComponent(formId);
+    let formComponent = window.App.getComponent(this.formId);
     if(formComponent) {
       formComponent.deregisterControl(this.id)
     }

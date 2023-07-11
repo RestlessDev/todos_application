@@ -25,12 +25,26 @@ class TodosController extends ErstwhileController {
   listAction(args) {
     // set active tab
     window.App.scopes.page.sidebarMenuActive = "list-todos";
+    window.App.scopes.page.breadcrumbs = [
+      {
+        label: "List Todos"
+      }
+    ]
+    window.App.scopes.page.title = "List Page";
+    window.App.scopes.page.intro = "A listing of all of your Todos.";
     console.log("list!")
   }
 
   calendarAction(args) {
     // set active tab
     window.App.scopes.page.sidebarMenuActive = "calendar-todos";
+    window.App.scopes.page.breadcrumbs = [
+      {
+        label: "Calendar"
+      }
+    ];
+    window.App.scopes.page.title = "Calendar Page";
+    window.App.scopes.page.intro = "Your Todos, but on a calendar.";
     console.log("calendar!")
   }
 
