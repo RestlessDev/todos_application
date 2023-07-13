@@ -133,14 +133,12 @@ module.exports = {
   buildStyles: function(args = null) {
     console.log("Building styles...");
     // get the config
-    console.log(`${process.cwd()}/app/config/app.js`)
     const config = require(`${process.cwd()}/app/config/app.js`);
     
     /**
      * Some Variables
      */
     let components = {};
-
 
     // build the theme CSS
     if(!fs.existsSync(`${process.cwd()}/themes/${config.theme}/theme.js`)) {
@@ -149,7 +147,12 @@ module.exports = {
       const themeClass = require(`${process.cwd()}/themes/${config.theme}/theme`);
 
       // ensure all of the required libraries are present
-      let requires = themeClass.getRequires(), requiresSuccess = true, fontFolder = themeClass.getFontFolder(process.cwd());
+      let requires = themeClass.getRequires(), requiresSuccess = true, 
+        fontFolder = themeClass.getFontFolder(process.cwd()), 
+        cssFolder = themeClass.getCSSFolder(process.cwd()), 
+        jsFolder = themeClass.getJSFolder(process.cwd());
+
+      
       for(let i = 0; i < requires.length; i++) {
         try {
           let temp = require(requires[i]);
@@ -226,7 +229,15 @@ module.exports = {
         if(!fs.existsSync(`${process.cwd()}/dist/assets/fonts`)) {
           fs.mkdirSync(`${process.cwd()}/dist/assets/fonts`);
         }
-        fse.copySync(`${fontFolder}`, `${process.cwd()}/dist/assets/fonts`, { overwrite: true })
+        if(fontFolder) {
+          fse.copySync(`${fontFolder}`, `${process.cwd()}/dist/assets/fonts`, { overwrite: true })
+        }
+        if(cssFolder) {
+          fse.copySync(`${cssFolder}`, `${process.cwd()}/dist/assets/css`, { overwrite: true })
+        }
+        if(jsFolder) {
+          fse.copySync(`${jsFolder}`, `${process.cwd()}/dist/assets/js`, { overwrite: true })
+        }
         fs.writeFileSync(`${process.cwd()}/dist/assets/css/style.css`, cssFile);
       }
     }
@@ -251,6 +262,8 @@ module.exports = {
       controllers: {},
       layouts: {}
     }
+    let themeCSSLinks = "";
+    let themeJSScripts = ""; 
 
     // clear out the build/components directory if it exists
     if(!fs.existsSync(`${process.cwd()}/build`)) {
@@ -287,6 +300,9 @@ module.exports = {
           fs.mkdirSync(`${process.cwd()}/build`);
         } 
 
+        themeCSSLinks = themeClass.getCSSLinks("/assets/css");
+        themeJSScripts = themeClass.getScripts("/assets/js");
+      
         // grab each theme component
         let componentDirectories = fs.readdirSync(`${process.cwd()}/themes/${config.theme}`);
         for(let i in componentDirectories) {
@@ -327,7 +343,11 @@ module.exports = {
 
         // populate the ejs for the components
         for(let componentName in componentClasses) {
-          ejsObj.components[componentName] = precompileComponentEJS(`${process.cwd()}/themes/${config.theme}/${properComponentNames[componentName]}`);
+          if(fs.existsSync(`${process.cwd()}/build/components/${properComponentNames[componentName]}/component.ejs`)) {
+            ejsObj.components[componentName] = precompileComponentEJS(`${process.cwd()}/build/components/${properComponentNames[componentName]}`);
+          } else {
+            ejsObj.components[componentName] = "";
+          } 
         }
 
         // populate the app's layouts into the ejs object
@@ -344,9 +364,7 @@ module.exports = {
           
         }
 
-        for(let componentName in componentClasses) {
-          ejsObj.components[componentName] = precompileComponentEJS(`${process.cwd()}/themes/${config.theme}/${properComponentNames[componentName]}`);
-        }
+        
 
         // get the controllers
         if(fs.existsSync(`${process.cwd()}/app/controllers`) && fs.lstatSync(`${process.cwd()}/app/controllers`).isDirectory()) {
@@ -524,8 +542,17 @@ module.exports = {
         }
         
         // render index.html
-        let indexFile = ejs.render(fs.readFileSync(`${process.cwd()}/framework/base/public/index.html`, 'utf8'), {title: config.title || "Erstwhile Test App"});
-        fs.writeFileSync(`${process.cwd()}/dist/index.html`, indexFile);
+        if(fs.existsSync(`${process.cwd()}/app/public/index.html`)) {
+          fse.copySync(`${process.cwd()}/app/public/index.html`, `${process.cwd()}/build/index.html`, { overwrite: true })
+        } else {
+          let indexFile = ejs.render(fs.readFileSync(`${process.cwd()}/framework/base/public/index.html`, 'utf8'), {
+            title: config.title || "Erstwhile Test App",
+            themeCSSIncludes: themeCSSLinks,
+            themeJSScripts: themeJSScripts
+          });
+          fs.writeFileSync(`${process.cwd()}/dist/index.html`, indexFile);
+        }
+        
 
         try {
           fse.copySync(`${process.cwd()}/app/config`, `${process.cwd()}/build/config`, { overwrite: true })
@@ -537,7 +564,6 @@ module.exports = {
         }
 
         // 5. Render the bootstrap
-        // render index.html
         let componentList = [];
         for(let i in properComponentNames) {
           componentList.push(properComponentNames[i]);

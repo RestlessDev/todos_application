@@ -14,8 +14,20 @@ class ErstwhileTheme {
     return false;
   }
 
-  getScript() {
-    return '';
+  static getCSSFolder(appRoot) {
+    return false;
+  }
+
+  static getJSFolder(appRoot) {
+    return false;
+  }
+
+  static getCSSLinks(rootDir) {
+    return "";
+  }
+
+  static getScripts(rootDir) {
+    return "";
   }
 }
 

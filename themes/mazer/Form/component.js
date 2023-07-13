@@ -17,6 +17,12 @@ class Form extends ErstwhileForm {
     attributes.onsubmit = "return false;"
     return attributes;
   }
+  getClassName() {
+    return "mazer-form";
+  }
+  static getCSS(a, b, c ) {
+    return `.mazer-form { margin-bottom: 0px; }`
+  }
 }
 
 module.exports = Form;

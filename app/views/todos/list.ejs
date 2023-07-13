@@ -1,8 +1,28 @@
 <div class="row">
   <div class="col-12">
+    <FilterContainer title="Filter">
+      <form id="list-filter">
+        <div class="row">
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <TextInput label="Search" name="search" default="<%= page.filter && page.filter.sort ? page.filter.sort : "" %>" />
+          </div>
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <SelectInput label="Status" name="status">
+              <option value="not-complete">Not Complete</option>
+              <option value="complete">Complete</option>
+              <option value="all">All Todos</option>
+            </SelectInput>
+          </div>
+          <div class="col-12 col-sm-6 col-md-4 col-lg-6 text-end">
+            <Button color="light">Update Filter</Button>
+          </div>
+        </div>
+        
+      </form>
+    </FilterContainer>
     <Card>
       <DataTable>
-        
+
       </DataTable>
     </Card>
   </div>

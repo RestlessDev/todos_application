@@ -1,0 +1,15 @@
+<div class="form-group">
+  <% if(args.label) { %><label for="<%- args.id %>-field"><%= args.label %></label><% } %>
+    <select id="<%- args.id %>-field" class="form-select" placeholder="<% if(args.label) { %><%= args.label %><% } %>" autocomplete="off" value="<%= args.default %>">
+      <% if(args.options) { %>
+        <% for(let i in args.options) { %>
+        <option value="<%- args.options[i].value %>" <% if(args.default && args.default == args.options[i].value) { %>selected<% } %>><%- args.options[i].text %></option>
+        <% } %>
+      <% } %>
+    </select>
+  <% if(args.helpText) { %>
+  <p>
+    <small class="text-muted"><%= args.helpText %></small>
+  </p>
+  <% } %>
+</div>

@@ -294,7 +294,6 @@ class ErstwhileApp {
                       retval.scopedAttributes.push(theseScopedAttributes[j])
                     }
                   }
-                  console.log("scoped attributes", retval.scopedAttributes)
                   retval.html += component.getHtml(element[part]);
                   
                   retval.components[attributes.id] = component;
@@ -303,12 +302,14 @@ class ErstwhileApp {
                     retval.scripts.push({ id: component.id });
                   } else { 
                     let innerItem = this.renderDom(element[part]);
+                    console.log("Inner item", innerItem)
                     retval.components = {...retval.components, ...innerItem.components}
                     for(let j in innerItem.scopedAttributes) {
                       retval.scopedAttributes.push(innerItem.scopedAttributes[j])
                     }
                     // retval.scopedAttributes = [...retval.scopedAttributes, innerItem.scopedAttributes]
                     retval.scripts.push({func: function() {
+                      console.log("does it exist", jquery(`#${attributes.id} .erstwhile-container-inner`).length)
                       jquery(`#${attributes.id} .erstwhile-container-inner`).replaceWith(innerItem.html);
                     }})
                     retval.scripts = [...retval.scripts, ...innerItem.scripts];
@@ -381,7 +382,9 @@ class ErstwhileApp {
          */
         // 5. Set the variables to be used at the ejs layer
         let templateVars = {
-          scopes: _this.scopesStore
+          page: _this.scopesStore.page,
+          session: _this.scopesStore.session,
+          modal: _this.scopesStore.modal,
         }
 
         let initsToRun = [];
@@ -433,12 +436,12 @@ class ErstwhileApp {
         if(initsToRun.length > 0) {
           for(let i in initsToRun) {
             if(initsToRun[i].func) {
+              console.log("running script!", initsToRun[i])
               initsToRun[i].func();
             } else {
               let component = _this.getComponent(initsToRun[i].id);
               if(component) {
                 component.initialize();
-                console.log("y no binds", component)
                 if(component.willBindEvents()) {
                   component.bindEvents();
                 }

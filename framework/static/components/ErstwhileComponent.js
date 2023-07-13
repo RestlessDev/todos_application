@@ -38,11 +38,12 @@ class ErstwhileComponent {
       }
       
     }
-    this.args = params;
-    if(args.hidden) {
+    this.args = params || {};
+
+    if(this.args.hidden) {
       this.hidden = args.hidden;
     }
-    if(args.bindEvents) {
+    if(this.args.bindEvents) {
       this.bindEventsTest = args.bindEvents;
     }
   }
@@ -175,7 +176,7 @@ class ErstwhileComponent {
       for(let attribute in attributes) {
         attributeString += ` ${attribute}="${htmlEntities(attributes[attribute])}"`;
       }
-      let returnVal = `<${this.getTag() ? this.getTag() : 'div'} id=${this.id}${attributeString}>${html}</${this.getTag() ? this.getTag() : 'div'}>`;
+      let returnVal = `<${this.getTag() ? this.getTag() : 'div'} ${this.getClassName() ? `class="${this.getClassName()}"` : ''} id=${this.id}${attributeString}>${html}</${this.getTag() ? this.getTag() : 'div'}>`;
       if(replace) {
         jquery(`#${this.id}`).replaceWith(returnVal);
         return true;
@@ -220,6 +221,10 @@ class ErstwhileComponent {
   }
 
   getTag() {
+    return false;
+  }
+
+  getClassName() {
     return false;
   }
 

@@ -18,6 +18,22 @@ class MazerTheme extends ErstwhileTheme {
     return appRoot +'/themes/mazer/theme/fonts';
   }
 
+  static getCSSFolder(appRoot) {
+    return appRoot +'/themes/mazer/theme/css';
+  }
+
+  static getJSFolder(appRoot) {
+    return appRoot +'/themes/mazer/theme/js';
+  }
+
+  static getScripts(rootDir) {
+    return `<script defer src="${rootDir}/jquery.min.js"></script><script defer src="${rootDir}/jquery.dataTables.min.js"></script>`
+  }
+  
+  static getCSSLinks(rootDir) {
+    return `<link rel="stylesheet" href="${rootDir}/jquery.dataTables.min.css">`;
+  }
+
   static getCSS(appRoot, workingDirectory, themeConfig) {
     const absolutePath = appRoot +'/themes/mazer/theme/scss';
     workingDirectory += '/themeSCSS';

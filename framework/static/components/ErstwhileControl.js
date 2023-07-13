@@ -14,6 +14,10 @@ class ErstwhileControl extends ErstwhileComponent {
     retval[this.getKey()] = false;
     return retval;
   }
+
+  setValue(value) {
+    return true;
+  }
   
   initialize() {
     this.formId = jquery("body").find(`#${this.id}`).closest("form").attr("id");

@@ -32,7 +32,9 @@ class TodosController extends ErstwhileController {
     ]
     window.App.scopes.page.title = "List Page";
     window.App.scopes.page.intro = "A listing of all of your Todos.";
-    console.log("list!")
+    
+    // figure out the filters
+    
   }
 
   calendarAction(args) {
