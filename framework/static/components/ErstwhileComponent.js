@@ -217,6 +217,7 @@ class ErstwhileComponent {
   }
 
   unload() {
+    jquery(`#${this.id}`).remove();
     return true;
   }
 
@@ -229,8 +230,11 @@ class ErstwhileComponent {
   }
 
   bindEvents() {
+    let _this = this;
     for(let event in this.eventsToBind) {
-      jquery(`#${this.id}`).on(event, this.eventsToBind[event])
+      jquery(`#${this.id}`).on(event, function() {
+        _this.eventsToBind[event](_this)
+      })
     }
   }
 }

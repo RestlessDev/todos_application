@@ -1,5 +1,8 @@
 <div class="row">
   <div class="col-12">
+    <div class="text-end mb-3">
+      <Button id="add-todo" color="primary" onClick="@.page.createTodo">Create Todo</Button>
+    </div>
     <FilterContainer title="Filter">
       <form id="list-filter">
         <div class="row">
@@ -14,7 +17,7 @@
             </SelectInput>
           </div>
           <div class="col-12 col-sm-6 col-md-4 col-lg-6 text-end">
-            <Button color="light">Update Filter</Button>
+            <Button color="light" onclick="@.page.updateFilter">Update Filter</Button>
           </div>
         </div>
         

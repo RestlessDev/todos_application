@@ -43,7 +43,8 @@ class ErstwhileApp {
 
   components = {
     "layout" :{},
-    "page": {}
+    "page": {},
+    "modal": {}
   };
 
   constructor() {
@@ -170,10 +171,6 @@ class ErstwhileApp {
 
   setEJS(ejs) {
     this.ejs = ejs;
-  }
-
-  openModal(controller, modal, args) {
-    
   } 
 
   getDebug() {
@@ -392,8 +389,6 @@ class ErstwhileApp {
         let newLayoutComponents = false;
         let newPageComponents = false;
         
-        console.log("new layoutflag", _this.newLayoutFlag)
-
         if(_this.newLayoutFlag) {
           let tempMarkup = ejs.render(_this.ejs.layouts[_this.layout], templateVars);
           let layoutDom = parser.parse(tempMarkup);
@@ -436,7 +431,6 @@ class ErstwhileApp {
         if(initsToRun.length > 0) {
           for(let i in initsToRun) {
             if(initsToRun[i].func) {
-              console.log("running script!", initsToRun[i])
               initsToRun[i].func();
             } else {
               let component = _this.getComponent(initsToRun[i].id);
@@ -476,6 +470,190 @@ class ErstwhileApp {
         history.pushState({}, '', path);
       }
       this.openPath(path)
+    }
+  }
+
+  openModal(controller, modal, args) {
+    let _this = this;
+    // normalize the controller/modal names
+    if(!controller.endsWith("Controller")) {
+      controller += "Controller";
+    }
+    if(!modal.endsWith("Modal")) {
+      modal += "Modal";
+    }
+    controller = controller.substring(0, 1).toUpperCase() + controller.substring(1);
+    // modal = modal.substring(0, 1).toUpperCase() + modal.substring(1);
+
+    if(!_this.controllers[controller]) {
+      if(_this.getDebug()) {
+        console.log(`Notice: Controller "${controller}" not found.`);
+      }
+    } else if(!_this.controllers[controller][modal]) {
+      if(_this.getDebug()) {
+        console.log(`Notice: Modal "${controller}.${modal}" not found.`);
+      }
+    } else {
+      
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix : "@_",
+        alwaysCreateTextNode: true,
+        preserveOrder: true
+      });
+
+      _this.controllers[controller][modal]( args || {});
+
+      let templateVars = {
+        page: _this.scopesStore.page,
+        session: _this.scopesStore.session,
+        modal: _this.scopesStore.modal,
+      }
+
+      let initsToRun = [];
+      let scopedAttributes = [];
+      let newModalComponents = false;
+      
+      let thisTemplate = _this.ejs.controllers[controller][modal];
+
+      if(thisTemplate) {
+        _this.createModal();
+        let tempMarkup = ejs.render(thisTemplate, templateVars)
+        let templateDom = parser.parse(tempMarkup);
+        let templateMarkup = _this.renderDom(templateDom)
+        jquery("#modal .modal-body").html(templateMarkup.html)
+        initsToRun = [...initsToRun, ...templateMarkup.scripts]
+        scopedAttributes = [...scopedAttributes, ...templateMarkup.scopedAttributes]
+        newModalComponents = templateMarkup.components;
+      }
+
+      if(newModalComponents) {
+        for(let id in _this.components.modal) {
+          _this.removeListeners(id);
+          _this.components.modal[id].unload();
+        }
+        _this.components.modal = newModalComponents;
+      }
+
+      if(initsToRun.length > 0) {
+        for(let i in initsToRun) {
+          if(initsToRun[i].func) {
+            initsToRun[i].func();
+          } else {
+            let component = _this.getComponent(initsToRun[i].id);
+            if(component) {
+              component.initialize();
+              if(component.willBindEvents()) {
+                component.bindEvents();
+              }
+            }
+          }
+        }
+      }
+      if(scopedAttributes.length > 0) {
+        for(let i in scopedAttributes) {
+          if(scopedAttributes[i].id && scopedAttributes[i].property && scopedAttributes[i].key) 
+            _this.registerListener(scopedAttributes[i].id,scopedAttributes[i].property,scopedAttributes[i].key)
+        }
+      }
+
+      // actually open it
+      $('#modal').modal('show');
+    }
+  }
+
+  createModal() {
+    if(jquery('#modal').length == 0) {
+      let html = 
+      `<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="erstwhile-modal-title" aria-modal="true" role="dialog">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="erstwhile-modal-title">
+                Modal
+              </h5>
+              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <div class="modal-body">
+              
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+                <i class="bx bx-x d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Close</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+      jquery('body').append(html);
+    }
+  }
+  /**
+   * This updates the modal with the following options:
+   * 
+   * title
+   * size
+   * centered
+   * buttons
+   * theme
+   * 
+   * @param {*} args 
+   */
+  setModalAttributes(args) {
+    this.createModal();
+    for(let attr in args) {
+      switch(attr) {
+        case "title":
+          jquery("#erstwhile-modal-title").html(args[attr]);
+          break;
+        case "size":
+          jquery("#modal .modal-dialog").removeClass(`modal-sm`).removeClass(`modal-lg`).removeClass(`modal-xl`);
+          jquery("#modal .modal-dialog").addClass(`modal-${args[attr]}`)
+          break;
+        case "centered":
+          if(args[attr]) {
+            jquery("#modal .modal-dialog").addClass(`modal-dialog-centered`);
+          } else {
+            jquery("#modal .modal-dialog").removeClass(`modal-dialog-centered`);
+          }
+          break;
+        case "theme":
+          jquery("#modal .modal-header").removeClass(`bg-primary`).removeClass(`bg-secondary`).removeClass(`bg-danger`).removeClass(`bg-warning`).removeClass(`bg-info`).removeClass(`bg-dark`);
+          jquery("#modal .modal-header").addClass(`bg-${args[attr]}`);
+          break;
+        case "buttons":
+          jquery("#modal .modal-footer").empty();
+          jquery("#modal .modal-footer").append(`
+          <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">Close</span>
+          </button>
+          `);
+          for(let i in args[attr]) {
+            if(!args[attr][i].label) {
+              if(this.getDebug()) {
+                console.log("Notice: Modal button missing label. Skipped.")
+              }
+            } else if(!args[attr][i].func || typeof args[attr][i].func != 'function') {
+              if(this.getDebug()) {
+                console.log("Notice: Modal button missing function. Skipped.")
+              }
+            } else {
+              jquery("#modal .modal-footer").append(`
+              <button type="button" class="btn ${(args[attr][i].color ? `btn-${args[attr][i].color}` : "")} ms-1" id="modal-button-${i}">
+                <span class="d-block">${args[attr][i].label}</span>
+              </button>
+              `)
+              jquery(`#modal-button-${i}`).on('click', () => {
+                args[attr][i].func(args[attr][i].data || {});
+              })
+            }
+          }
+          break;
+      }
     }
   }
 }

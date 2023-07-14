@@ -34,7 +34,18 @@ class TodosController extends ErstwhileController {
     window.App.scopes.page.intro = "A listing of all of your Todos.";
     
     // figure out the filters
-    
+    window.App.scopes.page.updateFilter = (component) => {
+      let values = window.App.getComponent("list-filter").getValues();
+      let queryStrings = [];
+      for(let key in values) {
+        queryStrings.push(`${key}=${encodeURIComponent(values[key])}`)
+      }
+      window.App.redirect(`/todos/list?${queryStrings.join('&')}`)
+    }
+    window.App.scopes.page.createTodo = (component) => {
+      console.log("createTodo")
+      window.App.openModal("todos", "createTodo", {})
+    }
   }
 
   calendarAction(args) {
@@ -55,12 +66,17 @@ class TodosController extends ErstwhileController {
   }
 
   createTodoModal(args) {
-
+    window.App.setModalAttributes({title: "Create Todo"})
   }
 
   editTodoModal(args) {
     
   }
+
+  /**
+   * Non action methods
+   */
+  
 }
 
 module.exports = TodosController;
