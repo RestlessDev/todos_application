@@ -7,10 +7,10 @@
       <form id="list-filter">
         <div class="row">
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <TextInput label="Search" name="search" default="<%= page.filter && page.filter.sort ? page.filter.sort : "" %>" />
+            <TextInput label="Search" name="search" default="@.page.filterSearch" />
           </div>
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <SelectInput label="Status" name="status">
+            <SelectInput label="Status" name="status" default="@.page.filterStatus">
               <option value="not-complete">Not Complete</option>
               <option value="complete">Complete</option>
               <option value="all">All Todos</option>
@@ -24,8 +24,16 @@
       </form>
     </FilterContainer>
     <Card>
-      <DataTable>
-
+      <DataTable url="<%= window.App.getConfig('baseUrl') %>/todo/list" sort="date" sortdir="asc" filter="list-filter">
+        <columns>
+          <col key="title" title="Title" sortable="true" />
+          <col key="date" title="Date" sortable="true" type="date" />
+          <col key="description" title="Description" sortable="false" />
+          <col key="done_flag" title="Done?" sortable="true" type="boolean" />
+          <col title="Actions" key="id">
+            <button class="btn btn-success btn-sm" data-id="{{id}}" onclick="@.page.markDone">Mark Done</button> <button class="btn btn-light btn-sm" data-id="{{id}}" onclick="@.page.markDone">Edit</Button>
+          </col>
+        </columns>
       </DataTable>
     </Card>
   </div>

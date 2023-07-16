@@ -44,9 +44,23 @@ class TodosController extends ErstwhileController {
       }
       window.App.redirect(`/todos/list?${queryStrings.join('&')}`)
     }
+    let queryParams = new URLSearchParams(location.search);;
+    if(queryParams.get('search')) {
+      window.App.scopes.page.filterSearch = queryParams.get('search');
+    }
+    if(queryParams.get('status')) {
+      window.App.scopes.page.filterStatus = queryParams.get('status');
+    }
+
+    // add some actions for the buttons
     window.App.scopes.page.createTodo = (component) => {
-      console.log("createTodo")
       window.App.openModal("todos", "createTodo", {})
+    }
+    window.App.scopes.page.markDone = (component) => {
+      window.App.openModal("todos", "markDone", {id: component.getProperty('data-id')})
+    }
+    window.App.scopes.page.editTodo = (component) => {
+      window.App.redirect(`/todos/edit${component.getProperty('data-id')}`);
     }
   }
 
@@ -63,7 +77,7 @@ class TodosController extends ErstwhileController {
     console.log("calendar!")
   }
 
-  todoAction(args) {
+  editAction(args) {
     console.log("todo!")
   }
 
@@ -94,7 +108,7 @@ class TodosController extends ErstwhileController {
     }]})
   }
 
-  editTodoModal(args) {
+  markDoneModal(args) {
     
   }
 
