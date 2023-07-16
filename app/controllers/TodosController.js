@@ -4,14 +4,16 @@ const ErstwhileController = require("../../framework/static/controllers/Erstwhil
 class TodosController extends ErstwhileController {
   preAction(next) {
     if(!window.localStorage.erstwhileSessionKey) {
-      window.App.redirect(`/login?redirect=${window.location.pathname}`)
+      // window.App.redirect(`/login?redirect=${window.location.pathname}`)
+      document.location = `/login?redirect=${window.location.pathname}`;
     } else {
       if(!window.App.scopes.session.user) {
         let model = window.App.getModel('Authentication');
         model.currentUser().then(function(response) {
           window.App.scopes.session.user = response.data;
         }).catch(e => {
-          App.redirect(`/login?redirect=${window.location.pathname}`)
+          // App.redirect(`/login?redirect=${window.location.pathname}`)
+          document.location = `/login?redirect=${window.location.pathname}`;
         })
       }
       if(!window.App.scopes.session.sidebarMenu) {
@@ -66,7 +68,30 @@ class TodosController extends ErstwhileController {
   }
 
   createTodoModal(args) {
-    window.App.setModalAttributes({title: "Create Todo"})
+    let createTodo = () => {
+      let formValues = window.App.getComponent("create-todo").getValues();
+      let model = window.App.getModel('Todo');
+      model.create(formValues).then(function(response) {
+        console.log(response.data)
+        if(response.data.success === false) {
+          window.App.scopes.modal.message = "There were errors in your form";
+          window.App.getComponent('create-todo').showErrors(response.data);
+          window.App.getComponent("create-todo-alert").show();
+        } else {
+          window.App.getComponent("create-todo-alert").hide();
+          window.App.getComponent('create-todo').clearErrors();
+          window.App.closeModal();
+        }
+      }).catch(function(e) {
+        console.log("error", e)
+      });
+      
+    }
+    window.App.setModalAttributes({title: "Create Todo", theme: "primary", centered: true, buttons: [{
+      label: "Create",
+      func: createTodo,
+      color: 'primary'
+    }]})
   }
 
   editTodoModal(args) {

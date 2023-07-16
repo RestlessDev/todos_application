@@ -4,6 +4,43 @@ class ErstwhileForm extends ErstwhileComponent {
 
   controls = [];
 
+  getControl(name) {
+    let retval = null;
+    for(let i in this.controls) {
+      let tempComponent = window.App.getComponent(this.controls[i]);
+      if(tempComponent && tempComponent.getKey() == name) {
+        retval = tempComponent;
+      }
+    }
+    return retval;
+  }
+
+  showErrors(response) {
+    if(response.success) {
+      this.clearErrors();
+    } else {
+      if(response.errorsObj) {
+        for(let i in this.controls) {
+          let tempComponent = window.App.getComponent(this.controls[i]);
+          if(response.errorsObj[tempComponent.getKey()]) {
+            tempComponent.setValid(false, response.errorsObj[tempComponent.getKey()]);
+          } else {
+            tempComponent.setValid(true);
+          }
+        }  
+      }
+    }
+  }
+
+  clearErrors() {
+    for(let i in this.controls) {
+      let tempComponent = window.App.getComponent(this.controls[i]);
+      if(tempComponent) {
+        tempComponent.setValid(true)
+      }
+    }
+  }
+
   registerControl(id) {
     this.controls.push(id);
   }

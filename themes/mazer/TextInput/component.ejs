@@ -1,6 +1,7 @@
 <div class="form-group">
   <% if(args.label) { %><label for="<%- args.id %>-field"><%= args.label %></label><% } %>
-  <input type="text" id="<%- args.id %>-field" class="form-control" placeholder="<% if(args.label) { %><%= args.label %><% } %>" autocomplete="off">
+  <input type="text" id="<%- args.id %>-field" class="form-control" placeholder="<% if(args.label) { %><%= args.label %><% } %>" autocomplete="off" value="<%= args.default %>">
+  <div class="invalid-feedback"></div>
   <% if(args.helpText) { %>
   <p>
     <small class="text-muted"><%= args.helpText %></small>

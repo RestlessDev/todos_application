@@ -5,6 +5,8 @@ class ErstwhileControl extends ErstwhileComponent {
 
   formId = null;
 
+  valid = true;
+
   getKey() {
     return this.args.name;
   }
@@ -17,6 +19,26 @@ class ErstwhileControl extends ErstwhileComponent {
 
   setValue(value) {
     return true;
+  }
+
+  setValid(valid, message = '') {
+    if(valid) {
+      jquery(`#${this.id}-field`).removeClass('is-invalid');
+    } else {
+      jquery(`#${this.id}-field`).addClass('is-invalid');
+    }
+    if(jquery(`#${this.id} .invalid-feedback`).length > 0) {
+      if(!valid) {
+        jquery(`#${this.id} .invalid-feedback`).addClass('d-none')
+      }
+      if(message) {
+        jquery(`#${this.id} .invalid-feedback`).html(message);
+        jquery(`#${this.id} .invalid-feedback`).removeClass('d-none')
+      } else {
+        jquery(`#${this.id} .invalid-feedback`).addClass('d-none')
+      }    
+    }
+    this.valid = valid;
   }
   
   initialize() {

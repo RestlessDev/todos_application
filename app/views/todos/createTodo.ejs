@@ -1,3 +1,13 @@
-<div>
-  <h3>Create Todo</h3>
-</div>
+<Alert id="create-todo-alert" color="danger" light="true" dismissible="true" hidden="true" message="@.modal.message"></Alert>
+<form id="create-todo">
+  <TextInput name="title" label="Title" required="true" />
+  <DateInput name="date" label="Date" />
+  <SelectInput name="color" label="Color">
+    <option value="green">Green</option>
+    <option value="blue">Blue</option>
+    <option value="orange">Orange</option>
+    <option value="red">Red</option>
+    <option value="yellow">Yellow</option>
+  </SelectInput>
+  <TextareaInput name="description" label="Description" helpText="This should be a description if the todo if necessary." rows="10" required="true" /> 
+</form>

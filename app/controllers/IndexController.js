@@ -11,8 +11,8 @@ class IndexController extends ErstwhileController {
           model.currentUser().then(function(response) {
             window.App.scopes.session.user = response.data;
             let queryParams = new URLSearchParams(location.search);;
-            if(queryParams.redirect) {
-              window.App.redirect(queryParams.redirect)
+            if(queryParams.get('redirect')) {
+              window.App.redirect(queryParams.get('redirect'))
             } else {
               window.App.redirect("/todos/list")
             }

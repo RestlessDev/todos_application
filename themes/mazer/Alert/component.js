@@ -4,8 +4,6 @@ const ejs = require('ejs');
 const jquery = require("jquery")
 
 class Alert extends ErstwhileComponent {
-  message = "";
-
   isContainer() {
     return true;
   }
@@ -28,6 +26,12 @@ class Alert extends ErstwhileComponent {
     delete attributes.light;
     delete attributes.dismissable;
     return attributes;
+  }
+  receiveUpdate(key, value) {
+    if(key.toLowerCase() == "message") {
+      jquery(`#${this.id} .alert-message`).html(value);
+    }
+    this.receiveGlobalUpdates(key, value);
   }
 }
 

@@ -174,9 +174,11 @@ class ErstwhileComponent {
       let attributeString = "";
       let attributes = this.prepareAttributes();
       for(let attribute in attributes) {
-        attributeString += ` ${attribute}="${htmlEntities(attributes[attribute])}"`;
+        if(attribute != 'id') {
+          attributeString += ` ${attribute}="${htmlEntities(attributes[attribute])}"`;
+        }
       }
-      let returnVal = `<${this.getTag() ? this.getTag() : 'div'} ${this.getClassName() ? `class="${this.getClassName()}"` : ''} id=${this.id}${attributeString}>${html}</${this.getTag() ? this.getTag() : 'div'}>`;
+      let returnVal = `<${this.getTag() ? this.getTag() : 'div'} ${this.getClassName() ? `class="${this.getClassName()}"` : ''} id="${this.id}" ${attributeString}>${html}</${this.getTag() ? this.getTag() : 'div'}>`;
       if(replace) {
         jquery(`#${this.id}`).replaceWith(returnVal);
         return true;
@@ -189,7 +191,7 @@ class ErstwhileComponent {
   }
 
   initialize( ) {
-    console.log(`Initializing ${this.id}`) 
+    // console.log(`Initializing ${this.id}`) 
   }
 
   receiveUpdate(key, value) {

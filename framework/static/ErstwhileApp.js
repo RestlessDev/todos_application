@@ -4,12 +4,13 @@ const ejs = require('ejs');
 const { v4: uuidv4 } = require('uuid');
 const ObservableSlim = require('observable-slim');
 const resolvePath = require('object-resolve-path');
+const bootstrap = require('bootstrap');
 
 class ErstwhileApp {
 
   routes = false;
 
-  modals = false;
+  modal = false;
 
   controllers = false;
 
@@ -56,11 +57,9 @@ class ErstwhileApp {
       for(let i = 0; i < changes.length; i++) {
         if(_this.listeners[changes[i].currentPath]) {
           for(let id in _this.listeners[changes[i].currentPath]) {
-            if(_this.components.layout[id] || _this.components.page[id]) {
-              let component = _this.components.layout[id] ? _this.components.layout[id] : _this.components.page[id]
-              for(let j in _this.listeners[changes[i].currentPath][id]) {
-                component.receiveUpdate(_this.listeners[changes[i].currentPath][id][j], changes[i].newValue)
-              }
+            let component = window.App.getComponent(id);
+            for(let j in _this.listeners[changes[i].currentPath][id]) {
+              component.receiveUpdate(_this.listeners[changes[i].currentPath][id][j], changes[i].newValue)
             }
           }
         }
@@ -88,13 +87,15 @@ class ErstwhileApp {
 
     // add popstate handler
     window.addEventListener("popstate", (event) => {
-      console.log(window.location)
+      // console.log(window.location)
       window.App.openPath(`${window.location.pathname}${window.location.search}${window.location.hash}`);
     });
   }
 
   registerListener(id, property, key) {
-    console.log("registering listener", id, property, key)
+    if(this.getDebug()) {
+      console.log("registering listener", id, property, key)
+    }
     let keys = property.split(".")
     if(keys[0] == "") {
       keys.shift()
@@ -185,11 +186,21 @@ class ErstwhileApp {
     }
   }
 
+  getModal() {
+    if(this.modal) {
+      return this.modal;
+    } else {
+      this.modal = new bootstrap.Modal("#modal");
+      return this.modal;
+    }
+  }
   getComponent(id) {
     if(this.components.layout[id]) {
       return this.components.layout[id];
     } else if(this.components.page[id]) {
       return this.components.page[id];
+    } else if(this.components.modal[id]) {
+      return this.components.modal[id];
     } else {
       return false;
     }
@@ -205,8 +216,7 @@ class ErstwhileApp {
   getModel(model) {
     if(this.models[model]) {
       return this.models[model];
-    } else {  c
-      console.log(`Notice: Model "${model}" not found.`)
+    } else {  
       return false;
     }
   }
@@ -299,14 +309,12 @@ class ErstwhileApp {
                     retval.scripts.push({ id: component.id });
                   } else { 
                     let innerItem = this.renderDom(element[part]);
-                    console.log("Inner item", innerItem)
                     retval.components = {...retval.components, ...innerItem.components}
                     for(let j in innerItem.scopedAttributes) {
                       retval.scopedAttributes.push(innerItem.scopedAttributes[j])
                     }
                     // retval.scopedAttributes = [...retval.scopedAttributes, innerItem.scopedAttributes]
                     retval.scripts.push({func: function() {
-                      console.log("does it exist", jquery(`#${attributes.id} .erstwhile-container-inner`).length)
                       jquery(`#${attributes.id} .erstwhile-container-inner`).replaceWith(innerItem.html);
                     }})
                     retval.scripts = [...retval.scripts, ...innerItem.scripts];
@@ -415,15 +423,19 @@ class ErstwhileApp {
         // remove the old components if needed 
         if(newLayoutComponents) {
           for(let id in _this.components.layout) {
-            _this.removeListeners(id);
-            _this.components.layout[id].unload();
+            if(!newLayoutComponents[id]) {
+              _this.removeListeners(id);
+              _this.components.layout[id].unload();
+            }
           }
           _this.components.layout = newLayoutComponents;
         }
         if(newPageComponents) {
           for(let id in _this.components.page) {
-            _this.removeListeners(id);
-            _this.components.page[id].unload();
+            if(!newPageComponents[id]) {
+              _this.removeListeners(id);
+              _this.components.page[id].unload();
+            }
           }
           _this.components.page = newPageComponents;
         }
@@ -529,12 +541,14 @@ class ErstwhileApp {
 
       if(newModalComponents) {
         for(let id in _this.components.modal) {
-          _this.removeListeners(id);
-          _this.components.modal[id].unload();
+          if(!newModalComponents[id]) {
+            _this.removeListeners(id);
+            _this.components.modal[id].unload();
+          }
         }
         _this.components.modal = newModalComponents;
       }
-
+      
       if(initsToRun.length > 0) {
         for(let i in initsToRun) {
           if(initsToRun[i].func) {
@@ -558,15 +572,19 @@ class ErstwhileApp {
       }
 
       // actually open it
-      $('#modal').modal('show');
+      this.getModal().show()
     }
+  }
+
+  closeModal() {
+    window.App.getModal().hide()
   }
 
   createModal() {
     if(jquery('#modal').length == 0) {
       let html = 
       `<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="erstwhile-modal-title" aria-modal="true" role="dialog">
-        <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="erstwhile-modal-title">
@@ -620,9 +638,20 @@ class ErstwhileApp {
             jquery("#modal .modal-dialog").removeClass(`modal-dialog-centered`);
           }
           break;
+        case "scroll":
+          if(args[attr]) {
+            jquery("#modal .modal-dialog").addClass(`modal-dialog-scrollable`);
+          } else {
+            jquery("#modal .modal-dialog").removeClass(`modal-dialog-scrollable`);
+          }
+          break;
         case "theme":
-          jquery("#modal .modal-header").removeClass(`bg-primary`).removeClass(`bg-secondary`).removeClass(`bg-danger`).removeClass(`bg-warning`).removeClass(`bg-info`).removeClass(`bg-dark`);
+          jquery("#modal .modal-header").removeClass(`bg-primary`).removeClass(`bg-secondary`).removeClass(`bg-danger`).removeClass(`bg-success`).removeClass(`bg-warning`).removeClass(`bg-info`).removeClass(`bg-dark`);
+          jquery("#modal .modal-header h5").removeClass("white")
           jquery("#modal .modal-header").addClass(`bg-${args[attr]}`);
+          if(args[attr] == 'primary' || args[attr] == 'success' || args[attr] == 'danger' || args[attr] == 'dark' || args[attr] == 'info' ) {
+            jquery("#modal .modal-header h5").addClass("white")
+          }
           break;
         case "buttons":
           jquery("#modal .modal-footer").empty();

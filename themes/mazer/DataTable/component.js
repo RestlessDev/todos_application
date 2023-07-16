@@ -20,7 +20,7 @@ class DataTableComponent extends ErstwhileComponent {
       ]
     });
     */
-    console.log(this.datatable)
+    // console.log(this.datatable)
   }
 }
 
