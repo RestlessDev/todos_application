@@ -8,7 +8,6 @@ class FilterContainer extends ErstwhileComponent {
     return true;
   }
   initialize() {
-    console.log("filterContainer is this on?")
   }
   getClassName() {
     return "todos-filtercontainer";

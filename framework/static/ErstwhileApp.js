@@ -124,6 +124,74 @@ class ErstwhileApp {
     }
   }
   
+  /**
+   * This method is specifically mean to be used by components which need to add
+   * new components in bulk. The three arguments are the items (outside of the HTML) 
+   * that come out of the renderDom() method.
+   * 
+   * Since they are scoped to the page, it is assumed that the component will be 
+   * responsible for managing themself so that over time the page performance  and
+   * resource usage of these subcomponents doesn't get too bad.
+   * 
+   * @param {*} components 
+   * @param {*} funcsToRun 
+   * @param {*} listeners 
+   */
+  registerComponents(components, scripts, scopedAttributes) {
+    let alreadyRegistered = []
+    if(components) {
+      for(let id in components) {
+        if(!this.getComponent(id)) {
+          this.components.page[id] = components[id];  
+        } else {
+          alreadyRegistered.push(id);
+        }
+      }
+    }
+
+    if(scripts.length > 0) {
+      for(let i in scripts) {
+        if(scripts[i].func) {
+          scripts[i].func();
+        } else {
+          if(alreadyRegistered.indexOf(scripts[i].id) == -1) {
+            let component = window.App.getComponent(scripts[i].id);
+            if(component) {
+              component.initialize();
+              if(component.willBindEvents()) {
+                component.bindEvents();
+              }
+            }
+          }
+        }
+      }
+    }
+    if(scopedAttributes.length > 0) {
+      for(let i in scopedAttributes) {
+        if(scopedAttributes[i].id && scopedAttributes[i].property && scopedAttributes[i].key) {
+          if(alreadyRegistered.indexOf(scopedAttributes[i].id) == -1) {
+            window.App.registerListener(scopedAttributes[i].id, scopedAttributes[i].property, scopedAttributes[i].key)
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * This method is meant to be called by components to bulk
+   * deregister child components.
+   * 
+   * @param {*} componentIds 
+   */
+  deregisterComponents(componentIds) {
+    for(let i in componentIds) {
+      let temp = this.getComponent(componentIds[i]);
+      if(temp) {
+        temp.unload()
+      }
+    }
+  }
+
   removeListeners(id) {
     for(let i in this.idsToListeners[id]) {
       if(this.listeners[this.idsToListeners[id][i]] && this.listeners[this.idsToListeners[id][i]][id]) {
@@ -314,9 +382,17 @@ class ErstwhileApp {
                       retval.scopedAttributes.push(innerItem.scopedAttributes[j])
                     }
                     // retval.scopedAttributes = [...retval.scopedAttributes, innerItem.scopedAttributes]
-                    retval.scripts.push({func: function() {
-                      jquery(`#${attributes.id} .erstwhile-container-inner`).replaceWith(innerItem.html);
-                    }})
+                    // retval.scripts.push({func: function() {
+                    /**
+                     * Ok. so here we are rendering the html in jquery and replacing the inner
+                     * element with the new data. Ugly but effective.
+                     */
+                    
+                    let $tmpHtml = jquery(`<div />`).html(retval.html);  
+                    $tmpHtml.find(`#${attributes.id} .erstwhile-container-inner`).replaceWith(innerItem.html).html();
+                    //}})
+                    retval.html = $tmpHtml.html(); 
+                    
                     retval.scripts = [...retval.scripts, ...innerItem.scripts];
                     retval.scripts.push({ id: component.id });
                   } 

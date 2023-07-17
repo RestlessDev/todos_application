@@ -1,0 +1,9 @@
+<div class="form-check form-switch">
+  <input class="form-check-input" type="checkbox" id="<%- args.id %>-field" value="true">
+  <% if(args.label) { %><label class="form-check-label" for="<%- args.id %>-field"><%= args.label %></label><% } %>
+</div>
+<% if(args.helpText) { %>
+  <p>
+    <small class="text-muted"><%= args.helpText %></small>
+  </p>
+<% } %> 

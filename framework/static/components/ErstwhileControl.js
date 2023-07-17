@@ -18,6 +18,10 @@ class ErstwhileControl extends ErstwhileComponent {
   }
 
   setValue(value) {
+    console.log("set", value)
+    if(jquery(`#${this.id}-field`).length > 0) {
+      jquery(`#${this.id}-field`).val(value)
+    }
     return true;
   }
 

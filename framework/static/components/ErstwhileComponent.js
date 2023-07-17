@@ -80,6 +80,25 @@ class ErstwhileComponent {
     return this.args[property];
   }
 
+  /**
+   * Occasionally, components may need to dynamically create other components,
+   * and occasionally they will need to use placeholders for attributes.
+   * 
+   * This method uses the standard (standard?) convention of those placeholders 
+   * appearing like "{{variable}}"
+   * 
+   * @param {*} templateKey 
+   * @param {*} value 
+   */
+  updateTemplatizedProperties(templateKey, value) {
+    for(let key in this.args) {
+      if(typeof this.args[key] == 'string') {
+        const re = new RegExp(`\\{\\{${templateKey}\\}\\}`, 'g')
+        this.setProperty(key, this.args[key].replace(re, value))
+      }
+    } 
+  }
+
   prepareAttributes() {
     let attributes = {...this.args};
     this.prepareGlobalAttributes(attributes);

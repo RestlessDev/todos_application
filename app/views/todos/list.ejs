@@ -30,8 +30,8 @@
           <col key="date" title="Date" sortable="true" type="date" />
           <col key="description" title="Description" sortable="false" />
           <col key="done_flag" title="Done?" sortable="true" type="boolean" />
-          <col title="Actions" key="id">
-            <button class="btn btn-success btn-sm" data-id="{{id}}" onclick="@.page.markDone">Mark Done</button> <button class="btn btn-light btn-sm" data-id="{{id}}" onclick="@.page.markDone">Edit</Button>
+          <col title="Actions" key="id" sortable="false" width="150px">
+            <Button color="success" size="sm" data-id="{{id}}" onclick="@.page.markDone">Mark Done</Button> <Button class="mx-2" color="light" size="sm" data-id="{{id}}" onclick="@.page.editTodo">Edit</Button>
           </col>
         </columns>
       </DataTable>

@@ -7,7 +7,13 @@ class DataTableComponent extends ErstwhileComponent {
   datatable = null;
   columns = []
 
-  tableComponents = {};
+  toBeRegistered = {
+    components: {},
+    scripts: [],
+    scopedAttributes: []
+  }
+
+  tableComponents = [];
 
   innerDom = null;
 
@@ -28,6 +34,9 @@ class DataTableComponent extends ErstwhileComponent {
             }
             if(attributes["@_title"]) {
               column.title = attributes["@_title"];
+            }
+            if(attributes["@_width"]) {
+              column.width = attributes["@_width"];
             }
             if(attributes["@_type"]) {
               column.type = attributes["@_type"];
@@ -52,13 +61,35 @@ class DataTableComponent extends ErstwhileComponent {
             
             // this is where we need to figure out the custom rendering piece
             if(innerDom[i]["columns"][j]['col'].length > 0) {
+              let _this = this;
               column.render = function(data, type, row, meta) {
                 let html = window.App.renderDom(innerDom[i]["columns"][j]['col']);
-                console.log(html)
-                return html;
+                
+                // replace the values for this row
+                for(let key in row) {
+                  const re = new RegExp(`\\{\\{${key}\\}\\}`, 'g')
+                  html.html = html.html.replace(re, row[key])
+                  // update the components
+                  for(let key2 in html.components) {
+                    html.components[key2].updateTemplatizedProperties(key, row[key])
+                  }
+                }
+
+                // add the items to the registration list
+                if(Object.keys(html.components).length > 0) {
+                  _this.toBeRegistered.components = {..._this.toBeRegistered.components, ...html.components};
+                }
+                if(html.scripts.length > 0) {
+                  _this.toBeRegistered.scripts = [..._this.toBeRegistered.scripts, ...html.scripts];
+                }
+                if(html.scopedAttributes.length > 0) {
+                  _this.toBeRegistered.scopedAttributes = [..._this.toBeRegistered.scopedAttributes, ...html.scopedAttributes];
+                }
+                
+                // console.log("new datatable row", html)
+                return html.html;
               }
               //console.log("inner html", html)
-              console.log("inner", innerDom[i]["columns"][j]['col']);
             }
 
             if(column.data) {
@@ -106,12 +137,16 @@ class DataTableComponent extends ErstwhileComponent {
         }
       }
  
-
+      let _this = this;
       this.datatable = new DataTable(`#${this.id}-table`,{
         serverSide: true,
         ajax: ajax,
         searching: false,
-        columns: this.columns
+        columns: this.columns,
+        drawCallback: function(settings) {
+          // register the new items
+          window.App.registerComponents(_this.toBeRegistered.components, _this.toBeRegistered.scripts, _this.toBeRegistered.scopedAttributes)
+        }
       })
     }
     ; /*, {

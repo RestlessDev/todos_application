@@ -60,7 +60,7 @@ class TodosController extends ErstwhileController {
       window.App.openModal("todos", "markDone", {id: component.getProperty('data-id')})
     }
     window.App.scopes.page.editTodo = (component) => {
-      window.App.redirect(`/todos/edit${component.getProperty('data-id')}`);
+      window.App.redirect(`/todos/edit/${component.getProperty('data-id')}`);
     }
   }
 
@@ -109,7 +109,39 @@ class TodosController extends ErstwhileController {
   }
 
   markDoneModal(args) {
-    
+    let model = window.App.getModel('Todo');
+    model.get({}, {todoID: args.id}).then(function(todoResponse) {
+      // set the properties
+      window.App.getComponent('mark-todo').getControl('done_flag').setValue(todoResponse.data.done_flag);
+      window.App.getComponent('mark-todo').getControl('completion_notes').setValue(todoResponse.data.completion_notes);
+
+    }).catch(function(e) {
+      console.log("error", e)
+    });
+
+    let markTodo = () => {
+      let formValues = window.App.getComponent("mark-todo").getValues();
+      model.update(formValues, {todoID: args.id}).then(function(response) {
+        if(response.data.success === false) {
+          window.App.scopes.modal.message = "There were errors in your form";
+          window.App.getComponent('mark-todo').showErrors(response.data);
+          window.App.getComponent("mark-todo-alert").show();
+        } else {
+          window.App.getComponent("mark-todo-alert").hide();
+          window.App.getComponent('mark-todo').clearErrors();
+          window.App.closeModal();
+        }
+      }).catch(function(e) {
+        console.log("error", e)
+      });
+      
+    }
+
+    window.App.setModalAttributes({title: "Mark Todo", theme: "primary", centered: true, buttons: [{
+      label: "Update",
+      func: markTodo,
+      color: 'primary'
+    }]})
   }
 
   /**

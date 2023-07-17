@@ -23,7 +23,7 @@ class Button extends ErstwhileComponent {
     if(!attributes.class) {
       attributes.class = "";
     }
-    attributes.class += "btn";
+    attributes.class += " btn";
     if(attributes.outline == "true" && attributes.color) {
       attributes.class += ` btn-outline-${attributes.color}`;
     } else if(attributes.color) {
