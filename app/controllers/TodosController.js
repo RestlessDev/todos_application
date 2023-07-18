@@ -78,7 +78,28 @@ class TodosController extends ErstwhileController {
   }
 
   editAction(args) {
-    console.log("todo!")
+    // set active tab
+    window.App.scopes.page.sidebarMenuActive = "list-todos";
+    window.App.scopes.page.breadcrumbs = [
+      {
+        label: "List Todos",
+        link: "/todos/list"
+      },
+      {
+        label: "Edit Todo"
+      }
+    ]
+    window.App.scopes.page.title = "Edit Page";
+    window.App.scopes.page.intro = "Edit your Todo.";
+
+    let model = window.App.getModel('Todo');
+    model.get({}, {todoID: args.id}).then(function(todoResponse) {
+      window.App.scopes.page.todo = todoResponse.data;
+      window.App.scopes.page.title = `Edit ${todoResponse.data.title}`;
+
+    }).catch(function(e) {
+      console.log("error", e)
+    });
   }
 
   createTodoModal(args) {

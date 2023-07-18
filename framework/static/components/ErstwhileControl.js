@@ -18,10 +18,8 @@ class ErstwhileControl extends ErstwhileComponent {
   }
 
   setValue(value) {
-    console.log("set", value)
-    if(jquery(`#${this.id}-field`).length > 0) {
-      jquery(`#${this.id}-field`).val(value)
-    }
+    this.value = value;
+    this.receiveUpdate('value', value[this.getKey()])
     return true;
   }
 
@@ -52,6 +50,14 @@ class ErstwhileControl extends ErstwhileComponent {
     if(formComponent) {
       formComponent.registerControl(this.id)
     }
+  }
+
+  receiveUpdate(key, value) {
+    this.args[value] = value;
+    if(jquery(`#${this.id}-field`).length > 0) {
+      jquery(`#${this.id}-field`).val(value)
+    }
+    this.receiveGlobalUpdates(key, value);
   }
 
   unload() {

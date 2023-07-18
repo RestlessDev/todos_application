@@ -13,7 +13,7 @@ function validateRoute (route, definition, controllers = []) {
   }
 }
 
-function regexifyPath (path) {
+function regexifyPath (path, optionalWildcard = false) {
   let retval = "";
   if(path == "/") {
     retval = '\\/';
@@ -29,6 +29,9 @@ function regexifyPath (path) {
         }
       }
     }
+  }
+  if(optionalWildcard) {
+    retval += `(\\/(?<id>[a-zA-Z0-9_-]+))*`
   }
   return retval;
 }
@@ -414,7 +417,7 @@ module.exports = {
                       if(tempMethod == "indexAction") {
                         controllerRoutes[controllerName].routes.push({route: "", action: tempMethod, firstWildcard: 1});
                       } else if(tempMethod != "preAction" && tempMethod != "postAction" && tempMethod.endsWith("Action")) {
-                        controllerRoutes[controllerName].routes.push({route: `/${tempMethod.substring(0, tempMethod.indexOf("Action"))}`, action: tempMethod, firstWildcard: 2});
+                        controllerRoutes[controllerName].routes.push({route: `/${tempMethod.substring(0, tempMethod.indexOf("Action"))}`, action: tempMethod, firstWildcard: 2, optionalWildcard: true});
                       }
                     }
                   } else {
@@ -495,7 +498,7 @@ module.exports = {
           // do the routes
           for(let i in controllerRoutes["IndexController"].routes) {
             let tempRoute = `${(controllerRoutes["IndexController"].routes[i].action == "indexAction" ? '/$' : controllerRoutes["IndexController"].routes[i].route)}`;
-            let regexVersion = regexifyPath(tempRoute);
+            let regexVersion = regexifyPath(tempRoute, controllerRoutes["IndexController"].routes[i].optionalWildcard);
             routes[regexVersion] = {controller: "IndexController", action: controllerRoutes["IndexController"].routes[i].action };
           }
           // do the modals
@@ -511,7 +514,7 @@ module.exports = {
             // do the routes
             for(let i in controllerRoutes[controllerKey].routes) {
               let tempRoute = `${controllerRoutes[controllerKey].base}${(controllerRoutes[controllerKey].routes[i].route == "" ? "$" : controllerRoutes[controllerKey].routes[i].route)}`;
-              let regexVersion = regexifyPath(tempRoute);
+              let regexVersion = regexifyPath(tempRoute, controllerRoutes[controllerKey].routes[i].optionalWildcard);
               routes[regexVersion] = {controller: controllerKey, action: controllerRoutes[controllerKey].routes[i].action };
             }
             // do the modals
@@ -527,7 +530,7 @@ module.exports = {
           for(let i in tempRoutes) {
             let tempRoute = tempRoutes[i];
             if(tempRoute.route && tempRoute.controller && tempRoute.action) {
-              let regexVersion = regexifyPath(tempRoute.route);
+              let regexVersion = regexifyPath(tempRoute.route, tempRoute[i].optionalWildcard);
               routes[regexVersion] = {controller: tempRoute.controller, action: tempRoute.action };
             } else {
               console.log(`Notice: routes must have keys for "route", "controller", and "action". Skipped.`)

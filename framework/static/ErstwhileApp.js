@@ -55,11 +55,25 @@ class ErstwhileApp {
     let _this = this;
     this.scopes = ObservableSlim.create(this.scopesStore, true, function(changes) {
       for(let i = 0; i < changes.length; i++) {
-        if(_this.listeners[changes[i].currentPath]) {
-          for(let id in _this.listeners[changes[i].currentPath]) {
-            let component = window.App.getComponent(id);
-            for(let j in _this.listeners[changes[i].currentPath][id]) {
-              component.receiveUpdate(_this.listeners[changes[i].currentPath][id][j], changes[i].newValue)
+        let pathProps = changes[i].currentPath.split('.');
+        if(['page','session','modal'].indexOf(pathProps[0]) > -1) {
+          let pathsToTrigger = { };
+          pathsToTrigger[`${changes[i].currentPath}`] = changes[i].newValue;
+          if(changes[i].newValue && typeof changes[i].newValue == 'object') {
+            for(let key in changes[i].newValue) {
+              pathsToTrigger[`${changes[i].currentPath}.${key}`] = changes[i].newValue[key];
+            }
+          }
+          
+          for(let path in pathsToTrigger) {
+            // console.log("path", path, pathsToTrigger[path])
+            if(_this.listeners[path]) {
+              for(let id in _this.listeners[path]) {
+                let component = window.App.getComponent(id);
+                for(let j in _this.listeners[path][id]) {
+                  component.receiveUpdate(_this.listeners[path][id][j], pathsToTrigger[path])
+                }
+              }
             }
           }
         }
@@ -431,11 +445,13 @@ class ErstwhileApp {
 
   openPath(path) {
     let found = false;
+    let groups = {};
     for(let i in this.routes) {
       const re = new RegExp(i);
       let matches = path.match(re);
       if(matches) {
         found = this.routes[i];
+        groups = matches.groups;
       }
     }
     if(!found) {
@@ -540,7 +556,7 @@ class ErstwhileApp {
       }
       let postPre = function() {
         // 3. Perform the controller action
-        _this.controllers[found['controller']][found['action']]();
+        _this.controllers[found['controller']][found['action']](groups);
         
         // 4. Perform the postAction on the controller
         _this.controllers[found['controller']].postAction(postController);

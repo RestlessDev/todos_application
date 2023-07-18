@@ -1,0 +1,19 @@
+<div class="row">
+  <div class="col-12 col-lg-6">
+    <Card>
+      <Alert id="edit-todo-alert" color="danger" light="true" dismissible="true" hidden="true" message="@.modal.message"></Alert>
+      <form id="edit-todo">
+        <TextInput name="title" label="Title" required="true" value="@.page.todo.title" />
+        <DateInput name="date" label="Date" value="@.page.todo.date" />
+        <SelectInput name="color" label="Color" value="@.page.todo.color">
+          <option value="green">Green</option>
+          <option value="blue">Blue</option>
+          <option value="orange">Orange</option>
+          <option value="red">Red</option>
+          <option value="yellow">Yellow</option>
+        </SelectInput>
+        <TextareaInput name="description" label="Description" helpText="This should be a description if the todo if necessary." rows="10" required="true" value="@.page.todo.description" /> 
+      </form>
+    </Card>
+  </div>
+</div>
