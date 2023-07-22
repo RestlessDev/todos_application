@@ -13,7 +13,14 @@
           <option value="yellow">Yellow</option>
         </SelectInput>
         <TextareaInput name="description" label="Description" helpText="This should be a description if the todo if necessary." rows="10" required="true" value="@.page.todo.description" /> 
+        <SwitchInput name="done_flag" label="Completed" value="@.page.todo.done_flag" />
+        <TextareaInput name="completion_notes" label="Completion Notes" helpText="Anything else to add about this todo?" rows="10" required="false" value="@.page.todo.completion_notes" /> 
       </form>
+      <div class="text-end">
+        <span id="edit-success" class="text-success px-2 d-none">Updated!</span>
+        <Button color="danger" onclick="@.page.deleteTodo">Delete</Button>
+        <Button color="primary" class="mx-2" onclick="@.page.saveTodo">Save</Button>
+      </div>
     </Card>
   </div>
 </div>

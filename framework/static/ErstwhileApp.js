@@ -48,6 +48,8 @@ class ErstwhileApp {
     "modal": {}
   };
 
+  deferredFunctions = [];
+
   constructor() {
     /**
      * Set up the scope proxy object
@@ -69,7 +71,7 @@ class ErstwhileApp {
             // console.log("path", path, pathsToTrigger[path])
             if(_this.listeners[path]) {
               for(let id in _this.listeners[path]) {
-                let component = window.App.getComponent(id);
+                let component = window.$App.getComponent(id);
                 for(let j in _this.listeners[path][id]) {
                   component.receiveUpdate(_this.listeners[path][id][j], pathsToTrigger[path])
                 }
@@ -78,7 +80,7 @@ class ErstwhileApp {
           }
         }
       }
-      // console.log(JSON.stringify(changes), _this.template);
+      // console.log(changes, _this.template);
     });
 
     // fix anchors
@@ -94,7 +96,7 @@ class ErstwhileApp {
           ) {
             e.preventDefault();
             e.stopPropagation()
-            window.App.redirect(href);
+            window.$App.redirect(href);
           }
       }
     })
@@ -102,7 +104,7 @@ class ErstwhileApp {
     // add popstate handler
     window.addEventListener("popstate", (event) => {
       // console.log(window.location)
-      window.App.openPath(`${window.location.pathname}${window.location.search}${window.location.hash}`);
+      window.$App.openPath(`${window.location.pathname}${window.location.search}${window.location.hash}`);
     });
   }
 
@@ -169,7 +171,7 @@ class ErstwhileApp {
           scripts[i].func();
         } else {
           if(alreadyRegistered.indexOf(scripts[i].id) == -1) {
-            let component = window.App.getComponent(scripts[i].id);
+            let component = window.$App.getComponent(scripts[i].id);
             if(component) {
               component.initialize();
               if(component.willBindEvents()) {
@@ -184,7 +186,7 @@ class ErstwhileApp {
       for(let i in scopedAttributes) {
         if(scopedAttributes[i].id && scopedAttributes[i].property && scopedAttributes[i].key) {
           if(alreadyRegistered.indexOf(scopedAttributes[i].id) == -1) {
-            window.App.registerListener(scopedAttributes[i].id, scopedAttributes[i].property, scopedAttributes[i].key)
+            window.$App.registerListener(scopedAttributes[i].id, scopedAttributes[i].property, scopedAttributes[i].key)
           }
         }
       }
@@ -553,6 +555,9 @@ class ErstwhileApp {
               _this.registerListener(scopedAttributes[i].id,scopedAttributes[i].property,scopedAttributes[i].key)
           }
         }
+
+        // run any deferred functions
+        _this.runDeferred();
       }
       let postPre = function() {
         // 3. Perform the controller action
@@ -563,18 +568,43 @@ class ErstwhileApp {
       }
       
       // 2. Start the preAction on the controller
+      this.scopes.page = {}
+
       this.controllers[found['controller']].preAction(postPre);
       
     }
   }
 
-  redirect(path, updateHistory = true) {
+  redirect(path, updateHistory = true, scrollTop = true) {
     if(path !== window.location.pathname) {
       if(updateHistory) {
         history.pushState({}, '', path);
       }
       this.openPath(path)
+      if(scrollTop) {
+        jquery(window).scrollTop(0)
+      }
     }
+  }
+
+  defer(func, time = 0) {
+    if(time && time > 0) {
+      this.deferredFunctions.push(function() {
+        setTimeout(function() {
+          func();
+        }, time);
+      });
+    } else {
+      this.deferredFunctions.push(func);
+    }
+    
+  }
+
+  runDeferred() {
+    for(let i in this.deferredFunctions) {
+      this.deferredFunctions[i]();
+    }
+    this.deferredFunctions = [];
   }
 
   openModal(controller, modal, args) {
@@ -663,13 +693,16 @@ class ErstwhileApp {
         }
       }
 
+      // run any deferred functions
+      _this.runDeferred();
+
       // actually open it
       this.getModal().show()
     }
   }
 
   closeModal() {
-    window.App.getModal().hide()
+    window.$App.getModal().hide()
   }
 
   createModal() {

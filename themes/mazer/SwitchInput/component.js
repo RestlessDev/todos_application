@@ -21,6 +21,14 @@ class SwitchInput extends ErstwhileControl {
   setValue(value) {
     jquery(`#${this.id}-field`).prop('checked', value)
   }
+
+  receiveUpdate(key, value) {
+    this.args[value] = value;
+    if(jquery(`#${this.id}-field`).length > 0) {
+      jquery(`#${this.id}-field`).prop('checked', value)
+    }
+    this.receiveGlobalUpdates(key, value);
+  }
   
   isContainer() {
     return false;

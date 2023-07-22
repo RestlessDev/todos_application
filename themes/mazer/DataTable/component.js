@@ -63,7 +63,7 @@ class DataTableComponent extends ErstwhileComponent {
             if(innerDom[i]["columns"][j]['col'].length > 0) {
               let _this = this;
               column.render = function(data, type, row, meta) {
-                let html = window.App.renderDom(innerDom[i]["columns"][j]['col']);
+                let html = window.$App.renderDom(innerDom[i]["columns"][j]['col']);
                 
                 // replace the values for this row
                 for(let key in row) {
@@ -113,6 +113,11 @@ class DataTableComponent extends ErstwhileComponent {
     }
   }
 
+  redraw() {
+    console.log("redraw")
+    this.datatable.ajax.reload();
+  }
+
   initialize() {
     if(!this.args.url) {
       console.log(`Notice: Datatable "${this.id}" requires URL to be specified.`)
@@ -127,7 +132,7 @@ class DataTableComponent extends ErstwhileComponent {
       if(this.args.filter) {
         let _this = this;
         ajax.data = function(d) {
-          let form = window.App.getComponent(_this.args.filter);
+          let form = window.$App.getComponent(_this.args.filter);
           if(form) {
             let data = form.getValues();
             for(let key in data) {
@@ -145,7 +150,7 @@ class DataTableComponent extends ErstwhileComponent {
         columns: this.columns,
         drawCallback: function(settings) {
           // register the new items
-          window.App.registerComponents(_this.toBeRegistered.components, _this.toBeRegistered.scripts, _this.toBeRegistered.scopedAttributes)
+          window.$App.registerComponents(_this.toBeRegistered.components, _this.toBeRegistered.scripts, _this.toBeRegistered.scopedAttributes)
         }
       })
     }

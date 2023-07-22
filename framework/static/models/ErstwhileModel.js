@@ -28,7 +28,7 @@ class ErstwhileModel {
   static async makeRequest(path, params, method = 'get', data, headers) {
     try {
       let axiosConfig = {
-        url: window.App.getConfig('baseUrl') + this.populateParams(path, params),
+        url: window.$App.getConfig('baseUrl') + this.populateParams(path, params),
         method
       }
       if(headers) {

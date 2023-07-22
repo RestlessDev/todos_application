@@ -1,5 +1,5 @@
 <Alert id="mark-todo-alert" color="danger" light="true" dismissible="true" hidden="true" message="@.modal.message"></Alert>
 <form id="mark-todo">
-  <SwitchInput name="done_flag" label="Completed" />
-  <TextareaInput name="completion_notes" label="Completion Notes" helpText="Anything else to add about this todo?" rows="10" required="false" /> 
+  <SwitchInput name="done_flag" label="Completed" value="@.modal.todo.done_flag" />
+  <TextareaInput name="completion_notes" label="Completion Notes" helpText="Anything else to add about this todo?" rows="10" required="false" value="@.modal.todo.completion_notes" /> 
 </form>

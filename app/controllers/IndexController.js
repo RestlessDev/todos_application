@@ -2,25 +2,26 @@ const ErstwhileController = require("../../framework/static/controllers/Erstwhil
 
 class IndexController extends ErstwhileController {
   loginAction(args) {
-    window.App.scopes.page.submitForm = function() {
-      window.App.getComponent("login-alert").hide();
-      let formValues = window.App.getComponent("login-form").getValues();
-      let model = window.App.getModel('Authentication');
+    $App.scopes.page.submitForm = function() {
+      $App.getComponent("login-alert").hide();
+      let formValues = $App.getComponent("login-form").getValues();
+      let model = $App.getModel('Authentication');
       model.login(formValues).then(function(response) {
         if(response.data.success) {
           model.currentUser().then(function(response) {
-            window.App.scopes.session.user = response.data;
+            $App.scopes.session.user = response.data;
             let queryParams = new URLSearchParams(location.search);;
             if(queryParams.get('redirect')) {
-              window.App.redirect(queryParams.get('redirect'))
+              $App.redirect(queryParams.get('redirect'))
             } else {
-              window.App.redirect("/todos/list")
+              $App.redirect("/todos/list")
             }
           }).catch(function(e) {
             console.log(e)
           });
         } else {
-          window.App.getComponent("login-alert").show();
+          
+          $App.getComponent("create-todo-alert").show();
         }
       }).catch(function(e) {
         console.log("error", e)
@@ -35,9 +36,9 @@ class IndexController extends ErstwhileController {
 
   indexAction(args) {
     if(window.localStorage.erstwhileSessionKey) {
-      window.App.redirect("/todos/list")
+      $App.redirect("/todos/list")
     } else {
-      window.App.redirect("/login")
+      $App.redirect("/login")
     }
   }
 }

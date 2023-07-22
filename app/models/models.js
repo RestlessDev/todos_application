@@ -140,6 +140,30 @@ class Todo extends ErstwhileModel {
       }
     }
   
+    static async calendar(data, params) {
+      try {
+        let headers = {};
+        
+        if(window.localStorage.erstwhileSessionKey) {
+          headers['Erstwhile-Session'] = window.localStorage.erstwhileSessionKey;
+        }
+        
+        
+        
+        let response = await this.makeRequest('/todo/calendar', params, 'get', data, headers);
+        
+          if(response.data.authenticated === false) {
+            throw new AuthenticationError("This endpoint requires authentication.");
+          } 
+        
+
+        
+        return response;
+      } catch(e) {
+        throw e;
+      }
+    }
+  
     static async get(data, params) {
       try {
         let headers = {};

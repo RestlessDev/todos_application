@@ -46,7 +46,7 @@ class ErstwhileControl extends ErstwhileComponent {
   initialize() {
     this.formId = jquery("body").find(`#${this.id}`).closest("form").attr("id");
 
-    let formComponent = window.App.getComponent(this.formId);
+    let formComponent = window.$App.getComponent(this.formId);
     if(formComponent) {
       formComponent.registerControl(this.id)
     }
@@ -61,7 +61,7 @@ class ErstwhileControl extends ErstwhileComponent {
   }
 
   unload() {
-    let formComponent = window.App.getComponent(this.formId);
+    let formComponent = window.$App.getComponent(this.formId);
     if(formComponent) {
       formComponent.deregisterControl(this.id)
     }

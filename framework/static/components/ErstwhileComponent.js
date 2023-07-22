@@ -26,7 +26,7 @@ class ErstwhileComponent {
     
     for(let key in args) {
       if(args[key].startsWith("@.")) {
-        params[key] = resolvePath(window.App.scopesStore, args[key].substring(2)) || '';
+        params[key] = resolvePath(window.$App.scopesStore, args[key].substring(2)) || '';
         this.argsToFilter.push(key)
         if(key.startsWith('on')) {
           if(this.constructor.events.indexOf(key.substring(2).toLowerCase()) >= 0) {
@@ -125,7 +125,7 @@ class ErstwhileComponent {
     for(let attribute in attributes) {
       let value = attributes[attribute];
       if(value.startsWith("@.")) {
-        let obj = resolvePath(window.App.scopesStore, value.substring(2));
+        let obj = resolvePath(window.$App.scopesStore, value.substring(2));
         if(typeof obj == 'function') {
           attributes[attribute] = `(${(obj.toString())})(); return false;`
         } else {
@@ -232,7 +232,7 @@ class ErstwhileComponent {
         this.bindEventsTest = false;
       }
     }
-    if(window.App.getDebug()) {
+    if(window.$App.getDebug()) {
       console.log(`Notice: Receiving global update: ${key} = ${JSON.stringify(value)} `)
     }
   }

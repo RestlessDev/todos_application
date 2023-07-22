@@ -7,7 +7,7 @@ class ErstwhileForm extends ErstwhileComponent {
   getControl(name) {
     let retval = null;
     for(let i in this.controls) {
-      let tempComponent = window.App.getComponent(this.controls[i]);
+      let tempComponent = window.$App.getComponent(this.controls[i]);
       if(tempComponent && tempComponent.getKey() == name) {
         retval = tempComponent;
       }
@@ -21,7 +21,7 @@ class ErstwhileForm extends ErstwhileComponent {
     } else {
       if(response.errorsObj) {
         for(let i in this.controls) {
-          let tempComponent = window.App.getComponent(this.controls[i]);
+          let tempComponent = window.$App.getComponent(this.controls[i]);
           if(response.errorsObj[tempComponent.getKey()]) {
             tempComponent.setValid(false, response.errorsObj[tempComponent.getKey()]);
           } else {
@@ -34,7 +34,7 @@ class ErstwhileForm extends ErstwhileComponent {
 
   clearErrors() {
     for(let i in this.controls) {
-      let tempComponent = window.App.getComponent(this.controls[i]);
+      let tempComponent = window.$App.getComponent(this.controls[i]);
       if(tempComponent) {
         tempComponent.setValid(true)
       }
@@ -54,7 +54,7 @@ class ErstwhileForm extends ErstwhileComponent {
   getValues() {
     let retval = {};
     for(let i =0; i< this.controls.length; i++) {
-      let component = window.App.getComponent(this.controls[i]);
+      let component = window.$App.getComponent(this.controls[i]);
       let values = component.getValue();
       retval = {...retval, ...values};
     }

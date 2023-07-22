@@ -22,14 +22,14 @@ for(let i in componentList) {
   componentClasses[componentList[i].toLowerCase()] = temp; 
 }
 
-window.App = new AppClass();
+window.$App = new AppClass();
 
-window.App.setRoutes(routes);
-window.App.setModals(modals);
-window.App.setConfig(config);
-window.App.setModels(models);
-window.App.setComponentClasses(componentClasses);
-window.App.setControllers(controllers);
-window.App.setEJS(ejs);
+$App.setRoutes(routes);
+$App.setModals(modals);
+$App.setConfig(config);
+$App.setModels(models);
+$App.setComponentClasses(componentClasses);
+$App.setControllers(controllers);
+$App.setEJS(ejs);
 
-window.App.openPath(window.location.pathname);
+window.$App.openPath(window.location.pathname);
