@@ -36,6 +36,23 @@ class SelectInput extends ErstwhileControl {
   isContainer() {
     return false;
   }
+  prepareAttributes() {
+    let attributes = {...this.args};
+    this.prepareGlobalAttributes(attributes);
+    if(attributes.inline) {
+      if(attributes.class) {
+        attributes.class += ' d-inline';
+      } else {
+        attributes.class = 'd-inline';
+      }
+    }
+
+    delete attributes.options;
+    delete attributes.value;
+    delete attributes.name;
+    delete attributes.inline;
+    return attributes;
+  }
 }
 
 module.exports = SelectInput;

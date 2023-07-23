@@ -31,7 +31,7 @@ class MazerTheme extends ErstwhileTheme {
   }
   
   static getCSSLinks(rootDir) {
-    return `<link rel="stylesheet" href="${rootDir}/jquery.dataTables.min.css">`;
+    return `<link rel="stylesheet" href="${rootDir}/jquery.dataTables.min.css"><link rel="stylesheet" href="${rootDir}/all.min.css">`;
   }
 
   static getCSS(appRoot, workingDirectory, themeConfig) {

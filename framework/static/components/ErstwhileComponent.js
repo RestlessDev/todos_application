@@ -253,9 +253,16 @@ class ErstwhileComponent {
   bindEvents() {
     let _this = this;
     for(let event in this.eventsToBind) {
-      jquery(`#${this.id}`).on(event, function() {
-        _this.eventsToBind[event](_this)
-      })
+      // to help out with controls
+      if(jquery(`#${this.id}-field`).length > 0) {
+        jquery(`#${this.id}-field`).on(event, function() {
+          _this.eventsToBind[event](_this)
+        })
+      } else {
+        jquery(`#${this.id}`).on(event, function() {
+          _this.eventsToBind[event](_this)
+        })
+      }
     }
   }
 }

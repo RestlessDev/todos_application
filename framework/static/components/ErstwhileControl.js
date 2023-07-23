@@ -54,8 +54,10 @@ class ErstwhileControl extends ErstwhileComponent {
 
   receiveUpdate(key, value) {
     this.args[value] = value;
-    if(jquery(`#${this.id}-field`).length > 0) {
-      jquery(`#${this.id}-field`).val(value)
+    if(key == 'value') {
+      if(jquery(`#${this.id}-field`).length > 0) {
+        jquery(`#${this.id}-field`).val(value)
+      }
     }
     this.receiveGlobalUpdates(key, value);
   }

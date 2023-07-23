@@ -27,9 +27,17 @@ class ErstwhileModel {
 
   static async makeRequest(path, params, method = 'get', data, headers) {
     try {
+      let getParams = []
+      if(method.toLowerCase() == 'get') {
+        for(let key in data) {
+          getParams.push(`${key}=${encodeURIComponent(data[key])}`)
+        }
+      }
+
       let axiosConfig = {
-        url: window.$App.getConfig('baseUrl') + this.populateParams(path, params),
-        method
+        url: window.$App.getConfig('baseUrl') + this.populateParams(path, params) + (getParams.length > 0 ? `?${getParams.join('&')}` : ''),
+        method,
+        data
       }
       if(headers) {
         axiosConfig.headers = headers;

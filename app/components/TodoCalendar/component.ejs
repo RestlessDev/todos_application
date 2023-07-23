@@ -1,4 +1,76 @@
-<div class="row">
-  <div class="col-2 text-start"></div>
-  <div class="col-2 text-end"></div>
+<%
+  if(!args.month) {
+    args.month = new Date().getMonth() + 1;
+  }
+  if(!args.year) {
+    args.year = new Date().getFullYear();
+  }
+
+  let firstDayOfMonth = new Date(`${args.year}-${args.month}-1`);
+  let currentDate = new Date(firstDayOfMonth);
+  currentDate.setDate(firstDayOfMonth.getDate() - firstDayOfMonth.getDay())
+  
+  let keepGoing = true;
+
+  // let's organize the todos by Date
+  let normalizedTodos = {}
+  for(let i in args.todos) {
+    let todoDate = new Date(args.todos[i].date);
+    let stringDate = `${todoDate.getFullYear()}-${(todoDate.getMonth() + 1)}-${todoDate.getDate()}`;
+    if(normalizedTodos[stringDate]) {
+      normalizedTodos[stringDate].push(args.todos[i]);
+    } else {
+      normalizedTodos[stringDate] = [];
+      normalizedTodos[stringDate].push(args.todos[i]);
+    }
+  }
+%>
+<div class="d-none d-lg-block">
+  <div class="table-responsive">
+    <table class="table table-bordered mb-0 todo-calendar-table">
+      <thead>
+        <tr class="bg-primary text-white text-center">
+          <th>Sunday</th>
+          <th>Monday</th>
+          <th>Tuesday</th>
+          <th>Wednesday</th>
+          <th>Thursday</th>
+          <th>Friday</th>
+          <th>Saturday</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% while(keepGoing) { %>
+            <tr>
+              <% for(let i = 0; i < 7; i++ ) { %>
+                <td id="todo-calendar-<%- currentDate.getFullYear() %>-<%- currentDate.getMonth() + 1 %>-<%- currentDate.getDate() %>" class="<%= currentDate.getMonth() + 1 != args.month ? 'inactive' : "" %>">
+                  <div class="day"><%= currentDate.getDate() %></div>
+                  <div class="todo-list">
+                    <% 
+                    if(normalizedTodos[`${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)}-${currentDate.getDate()}`]) {
+                      %><ul><%
+                      for(let j in normalizedTodos[`${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)}-${currentDate.getDate()}`]) {
+                        let todo = normalizedTodos[`${currentDate.getFullYear()}-${(currentDate.getMonth() + 1)}-${currentDate.getDate()}`][j];
+                        %><li><a href="/todos/edit/<%- todo.id %>" class="external-link" target="_blank" style="color: <%- todo.color %>; <% if(todo.done_flag) { %>text-decoration: line-through;<%} %>"><%- todo.title %></a></li><%
+                      }
+                      %></ul><%
+                    } 
+                    %>
+                  </div>
+                </td>
+                <% currentDate.setDate(currentDate.getDate() + 1); %>
+              <% } %>
+            </tr>
+          <% 
+            if(currentDate.getMonth() + 1 != args.month) {
+              keepGoing = false;
+            }
+          %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="d-lg-none">
+
 </div>

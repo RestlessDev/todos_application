@@ -75,7 +75,61 @@ class TodosController extends ErstwhileController {
     ];
     $App.scopes.page.title = "Calendar Page";
     $App.scopes.page.intro = "Your Todos, but on a calendar.";
-    console.log("calendar!")
+  
+    $App.scopes.page.year = new Date().getFullYear();
+    $App.scopes.page.calendarYear = new Date().getFullYear();
+    $App.scopes.page.calendarMonth = new Date().getMonth() + 1;
+
+    let queryParams = new URLSearchParams(location.search);;
+    if(queryParams.get('month') || queryParams.get('year')) {
+      // console.log("updating month and year")
+      $App.scopes.page.calendarMonth = queryParams.get('month');
+      $App.scopes.page.calendarYear = queryParams.get('year');
+    }
+
+    let fetchData = () => {
+      let model = $App.getModel('Todo');
+      model.calendar({month:  $App.scopes.page.calendarMonth, year:  $App.scopes.page.calendarYear}).then(function(todoResponse) {
+        $App.scopes.page.todos = todoResponse.data.todos;
+      }).catch(function(e) {
+        console.log("error", e)
+      });
+    }
+    fetchData();
+
+    // handle the changes on the filter
+    $App.scopes.page.updateFilter = function() {
+      let values = $App.getComponent("calendar-control").getValues();
+      if(values.month && values.year && (values.month != $App.scopes.page.calendarMonth || values.year != $App.scopes.page.calendarYear)) {
+        let queryStrings = [];
+        for(let key in values) {
+          queryStrings.push(`${key}=${encodeURIComponent(values[key])}`)
+        }
+        $App.redirect(`/todos/calendar?${queryStrings.join('&')}`, true, false)
+      }
+      return true;
+    }
+    
+    // handle the forward and back arrows
+    $App.scopes.page.prevMonth = function() {
+      if($App.scopes.page.calendarMonth > 1) {
+        $App.scopes.page.calendarMonth--;
+      } else {
+        $App.scopes.page.calendarMonth = 12;
+        $App.scopes.page.calendarYear--;
+      }
+      fetchData();
+    }
+    $App.scopes.page.nextMonth = function() {
+      if($App.scopes.page.calendarMonth == 12) {
+        $App.scopes.page.calendarMonth = 1;
+        $App.scopes.page.calendarYear++;
+      } else {
+        $App.scopes.page.calendarMonth++;
+      }
+      fetchData();
+    }
+    
   }
 
   editAction(args) {
