@@ -24,7 +24,7 @@
       </form>
     </FilterContainer>
     <Card>
-      <DataTable id="todo-list-table" url="<%= $App.getConfig('baseUrl') %>/todo/list" sort="date" sortdir="asc" filter="list-filter">
+      <DataTable id="todo-list-table" url="<%= $App.getConfig('baseUrl') %>/todo/list" sort="date" sortDir="asc" filter="list-filter">
         <columns>
           <col key="color" title="Color" sortable="true" width="50px">
             <ColorBox color="{{color}}" />
