@@ -3,6 +3,10 @@ const ErstwhileComponent = require('../../../framework/static/components/Erstwhi
 const ejs = require('ejs');
 const jquery = require("jquery")
 
+/**
+ * This is simple div with a background color. Used
+ * to show the color of the todo.
+ */
 class ColorBox extends ErstwhileComponent {
   initialize() {
   }

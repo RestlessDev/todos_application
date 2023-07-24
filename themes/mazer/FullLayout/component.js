@@ -23,8 +23,17 @@ class FullLayout extends ErstwhileLayout {
       this.renderBreadcrumbs(value)
     } else if(key.toLowerCase() == "pagetitle") {
       jquery(`#page-title`).html(value)
+      jquery('title').html(`${value}${(this.args.appName ? ` - ${this.args.appName}` : "")}`)
     } else if(key.toLowerCase() == "pageintro") {
       jquery(`#page-intro`).html(value)
+    } else if(key.toLowerCase() == "meta") {
+      for(let param in value) {
+        if(jquery(`meta[property="${param}"]`).length == 0) {
+          jquery(`head`).append(`<meta property="${param}" content="${value[param]}" />`)
+        } else {
+          jquery(`meta[property="${param}"]`).attr('content', value[param])
+        }
+      }
     }
     this.receiveGlobalUpdates(key, value);
   }

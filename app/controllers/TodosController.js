@@ -2,6 +2,16 @@ const ErstwhileController = require("../../framework/static/controllers/Erstwhil
 const jquery = require('jquery')
 
 class TodosController extends ErstwhileController {
+  /**
+   * All of the endpoints under the /todos controller require an account.
+   * For this reason, we add a pre action to check that the user is logged in,
+   * and if not redirect them to the login page with a redirect back after
+   * success.
+   * 
+   * We also set the sidebar menu if it isn't already set.
+   * 
+   * @param {*} next 
+   */
   preAction(next) {
     if(!window.localStorage.erstwhileSessionKey) {
       // $App.redirect(`/login?redirect=${window.location.pathname}`)
@@ -24,8 +34,18 @@ class TodosController extends ErstwhileController {
     }
   }
 
+  /**
+   * This action presents the user with a list of all of their todos
+   * in a data table. They can filter the list, resort it, and paginate through
+   * it.
+   * 
+   * There is a button to add a new todo, and buttons on each line item
+   * in the datatable to mark the individual todos as complete or edit them.
+   * 
+   * @param {*} args 
+   */
   listAction(args) {
-    // set active tab
+    // set active tab, as well as some other page parameters.
     $App.scopes.page.sidebarMenuActive = "list-todos";
     $App.scopes.page.breadcrumbs = [
       {
@@ -34,8 +54,11 @@ class TodosController extends ErstwhileController {
     ]
     $App.scopes.page.title = "List Page";
     $App.scopes.page.intro = "A listing of all of your Todos.";
+    $App.scopes.page.meta = {
+      "og:description": $App.scopes.page.intro
+    };
     
-    // figure out the filters
+    // the handler to update the filters
     $App.scopes.page.updateFilter = (component) => {
       let values = $App.getComponent("list-filter").getValues();
       let queryStrings = [];
@@ -44,6 +67,14 @@ class TodosController extends ErstwhileController {
       }
       $App.redirect(`/todos/list?${queryStrings.join('&')}`, true, false)
     }
+
+    /**
+     * Look to the query parameters to update the selected filters.
+     * 
+     * Because the table must render before it can be redraw, we need
+     * to defer the execution of the redraw until after the page is
+     * done rendering.
+     */
     let queryParams = new URLSearchParams(location.search);;
     if(queryParams.get('search') || queryParams.get('status')) {
       $App.scopes.page.filterSearch = queryParams.get('search');
@@ -53,7 +84,7 @@ class TodosController extends ErstwhileController {
       }, 100)  
     }
 
-    // add some actions for the buttons
+    // add some handlers for the buttons
     $App.scopes.page.createTodo = (component) => {
       $App.openModal("todos", "createTodo", {})
     }
@@ -65,8 +96,14 @@ class TodosController extends ErstwhileController {
     }
   }
 
+  /**
+   * This action presents the user with a calendar view of their todos,
+   * with the ability to page back and forth between months.
+   * 
+   * @param {*} args 
+   */
   calendarAction(args) {
-    // set active tab
+    // set active tab, as well as some other page parameters.
     $App.scopes.page.sidebarMenuActive = "calendar-todos";
     $App.scopes.page.breadcrumbs = [
       {
@@ -75,18 +112,28 @@ class TodosController extends ErstwhileController {
     ];
     $App.scopes.page.title = "Calendar Page";
     $App.scopes.page.intro = "Your Todos, but on a calendar.";
-  
+    $App.scopes.page.meta = {
+      "og:description": $App.scopes.page.intro
+    };
+
+    /** 
+     * Set the default month/year to this one.
+     * 
+     * The separate year is required to anchor the year dropdown
+     * to this year +/- 10 years.
+     */
     $App.scopes.page.year = new Date().getFullYear();
     $App.scopes.page.calendarYear = new Date().getFullYear();
     $App.scopes.page.calendarMonth = new Date().getMonth() + 1;
 
+    // update the month based on the query string.
     let queryParams = new URLSearchParams(location.search);;
     if(queryParams.get('month') || queryParams.get('year')) {
-      // console.log("updating month and year")
       $App.scopes.page.calendarMonth = queryParams.get('month');
       $App.scopes.page.calendarYear = queryParams.get('year');
     }
 
+    // the function to grab the month's todos from the server
     let fetchData = () => {
       let model = $App.getModel('Todo');
       model.calendar({month:  $App.scopes.page.calendarMonth, year:  $App.scopes.page.calendarYear}).then(function(todoResponse) {
@@ -95,9 +142,10 @@ class TodosController extends ErstwhileController {
         console.log("error", e)
       });
     }
+    // do the initial fetch
     fetchData();
 
-    // handle the changes on the filter
+    // handle the changes on the month/year filter
     $App.scopes.page.updateFilter = function() {
       let values = $App.getComponent("calendar-control").getValues();
       if(values.month && values.year && (values.month != $App.scopes.page.calendarMonth || values.year != $App.scopes.page.calendarYear)) {
@@ -132,8 +180,17 @@ class TodosController extends ErstwhileController {
     
   }
 
+  /**
+   * This action presents a form for the user to edit their
+   * todo.
+   * 
+   * The args object passed in will have one key (id) that is the
+   * ID of the todo to be edited.
+   * 
+   * @param {*} args 
+   */
   editAction(args) {
-    // set active tab
+    // set active tab and other page properties
     $App.scopes.page.sidebarMenuActive = "list-todos";
     $App.scopes.page.breadcrumbs = [
       {
@@ -146,7 +203,11 @@ class TodosController extends ErstwhileController {
     ]
     $App.scopes.page.title = "Edit Page";
     $App.scopes.page.intro = "Edit your Todo.";
+    $App.scopes.page.meta = {
+      "og:description": $App.scopes.page.intro
+    };
 
+    // grab the details of the todo from the server
     let model = $App.getModel('Todo');
     model.get({}, {todoID: args.id}).then(function(todoResponse) {
       $App.scopes.page.todo = todoResponse.data;
@@ -156,6 +217,7 @@ class TodosController extends ErstwhileController {
       console.log("error", e)
     });
 
+    // the save handler
     $App.scopes.page.saveTodo = function() {
       let formValues = $App.getComponent("edit-todo").getValues();
       model.update(formValues, {todoID: args.id}).then(function(response) {
@@ -175,9 +237,25 @@ class TodosController extends ErstwhileController {
         console.log("error", e)
       });
     }
+
+    // the delete handler
+    $App.scopes.page.deleteTodo = function() {
+      let formValues = $App.getComponent("edit-todo").getValues();
+      model.delete({}, {todoID: args.id}).then(function(response) {
+        $App.redirect('/todos/list')
+      }).catch(function(e) {
+        console.log("error", e)
+      });
+    }
   }
 
+  /**
+   * This modal presents the user with a form to create a new todo.
+   * 
+   * @param {*} args 
+   */
   createTodoModal(args) {
+    // the create handler
     let createTodo = () => {
       let formValues = $App.getComponent("create-todo").getValues();
       let model = $App.getModel('Todo');
@@ -198,25 +276,36 @@ class TodosController extends ErstwhileController {
       });
       
     }
-    $App.setModalAttributes({title: "Create Todo", theme: "primary", centered: true, buttons: [{
-      label: "Create",
-      func: createTodo,
-      color: 'primary'
-    }]})
+
+    // update the modal chrome with some new data
+    $App.setModalAttributes({
+      title: "Create Todo", 
+      theme: "primary", 
+      centered: true, 
+      buttons: [{
+        label: "Create",
+        func: createTodo,
+        color: 'primary'
+      }]
+    })
   }
 
+  /**
+   * This modal presents the user with a form allowing them to complete
+   * a todo, and add notes if needed.
+   * 
+   * @param {*} args 
+   */
   markDoneModal(args) {
+    // look up the todo data
     let model = $App.getModel('Todo');
     model.get({}, {todoID: args.id}).then(function(todoResponse) {
-      // set the properties
       $App.scopes.modal.todo = todoResponse.data;
-      // $App.getComponent('mark-todo').getControl('done_flag').setValue(todoResponse.data.done_flag);
-      // $App.getComponent('mark-todo').getControl('completion_notes').setValue(todoResponse.data.completion_notes);
-
     }).catch(function(e) {
       console.log("error", e)
     });
 
+    // the mark handler
     let markTodo = () => {
       let formValues = $App.getComponent("mark-todo").getValues();
       model.update(formValues, {todoID: args.id}).then(function(response) {
@@ -238,17 +327,18 @@ class TodosController extends ErstwhileController {
       
     }
 
-    $App.setModalAttributes({title: "Mark Todo", theme: "primary", centered: true, buttons: [{
-      label: "Update",
-      func: markTodo,
-      color: 'primary'
-    }]})
-  }
-
-  /**
-   * Non action methods
-   */
-  
+    // update the modal chrome with some new data
+    $App.setModalAttributes({
+      title: "Mark Todo", 
+      theme: "primary", 
+      centered: true, 
+      buttons: [{
+        label: "Update",
+        func: markTodo,
+        color: 'primary'
+      }]
+    })
+  } 
 }
 
 module.exports = TodosController;

@@ -3,6 +3,16 @@ const ErstwhileComponent = require('../../../framework/static/components/Erstwhi
 const ejs = require('ejs');
 const jquery = require("jquery")
 
+/**
+ * This slightly more advanced component displays a calendar that shows each
+ * of the month's todos on the date they are due to be done.
+ * 
+ * Most of the logic for building out the calendar is in the ejs template; when either
+ * the month or date change via the scoped parameters "month" or "year" the component
+ * just re-renders itself.
+ * 
+ * It's responsive, so if viewed on a smaller viewport it switches to a list view.
+ */
 class TodoCalendar extends ErstwhileComponent {
   initialize() {
     if(!this.args.todos) {

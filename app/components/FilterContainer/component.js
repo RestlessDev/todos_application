@@ -3,6 +3,9 @@ const ErstwhileComponent = require('../../../framework/static/components/Erstwhi
 const ejs = require('ejs');
 const jquery = require("jquery")
 
+/**
+ * This is the filter that appears on the list page.
+ */
 class FilterContainer extends ErstwhileComponent {
   isContainer() {
     return true;
