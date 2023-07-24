@@ -20,7 +20,7 @@ class ErstwhileApp {
 
   componentClasses = false;
 
-  layout = "default";
+  layout = null;
 
   template = false;
 
@@ -490,6 +490,10 @@ class ErstwhileApp {
         let scopedAttributes = [];
         let newLayoutComponents = false;
         let newPageComponents = false;
+
+        if(!_this.layout) {
+          _this.setLayout('default')
+        }
         
         if(_this.newLayoutFlag) {
           let tempMarkup = ejs.render(_this.ejs.layouts[_this.layout], templateVars);

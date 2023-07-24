@@ -5,7 +5,8 @@ const jquery = require("jquery")
 
 class DataTableComponent extends ErstwhileComponent {
   datatable = null;
-  columns = []
+  columns = [];
+  order = [[1, 'asc']]
 
   toBeRegistered = {
     components: {},
@@ -28,6 +29,9 @@ class DataTableComponent extends ErstwhileComponent {
             let attributes = innerDom[i]["columns"][j][':@'];
             if(attributes["@_key"]) {
               column.data = attributes["@_key"];
+              if(this.args.sort == column.data) {
+                this.order = [[j, this.args.sortDir && this.args.sortDir.toLowerCase() == 'desc' ? 'desc' : 'asc']]
+              }
             }
             if(attributes["@_sortable"]) {
               column.orderable = attributes["@_sortable"] == 'true';
@@ -148,6 +152,7 @@ class DataTableComponent extends ErstwhileComponent {
         ajax: ajax,
         searching: false,
         columns: this.columns,
+        order: this.order,
         drawCallback: function(settings) {
           // register the new items
           window.$App.registerComponents(_this.toBeRegistered.components, _this.toBeRegistered.scripts, _this.toBeRegistered.scopedAttributes)

@@ -79,7 +79,7 @@ module.exports = {
             name: "Authentication",
             methods: {}
           }
-          let authEndpointTypes = ['signup','login', 'forgotPassword', 'currentUser'];
+          let authEndpointTypes = ['signup','login', 'forgotPassword', 'currentUser', 'logout'];
           for(let i in authEndpointTypes) {
             if(apiResponse.data.authentication[authEndpointTypes[i]]) {
               if(Array.isArray(apiResponse.data.authentication[authEndpointTypes[i]])) {

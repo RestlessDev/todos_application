@@ -30,6 +30,9 @@ class TodoCalendar extends ErstwhileComponent {
       .todo-calendar-table .inactive {
         color: #dcdcdc;
       }
+      .todo-calendar-table .today {
+        background-color: #ced4da;
+      }
       .todo-calendar-table td {
         height: 150px;
         position: relative;

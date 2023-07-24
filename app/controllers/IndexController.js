@@ -1,6 +1,10 @@
 const ErstwhileController = require("../../framework/static/controllers/ErstwhileController");
 
 class IndexController extends ErstwhileController {
+  preAction(next) {
+    $App.setLayout('default');
+    next();
+  }
   loginAction(args) {
     $App.scopes.page.submitForm = function() {
       $App.getComponent("login-alert").hide();
@@ -21,7 +25,7 @@ class IndexController extends ErstwhileController {
           });
         } else {
           
-          $App.getComponent("create-todo-alert").show();
+          $App.getComponent("login-alert").show();
         }
       }).catch(function(e) {
         console.log("error", e)
@@ -31,7 +35,42 @@ class IndexController extends ErstwhileController {
   }
 
   signupAction(args) {
-    console.log("signup!")
+    $App.scopes.page.submitForm = function() {
+      $App.getComponent("signup-alert").hide();
+      let formValues = $App.getComponent("signup-form").getValues();
+      let model = $App.getModel('Authentication');
+      if(formValues.password && formValues.password == formValues.password_2 ) {
+        model.signup(formValues).then(function(response) {
+          if(response.data.success) {
+            jQuery('#initial-signup-form').addClass("d-none");
+            jQuery('#signup-success').removeClass("d-none");
+          } else {
+            $App.scopes.page.errorMessage = "There were errors in your form";
+            $App.getComponent('signup-form').showErrors(response.data);
+            $App.getComponent("signup-alert").show();
+          }
+        }).catch(function(e) {
+          console.log("error", e)
+        });
+      } else {
+        $App.scopes.page.errorMessage = "The passwords need to match.";
+        $App.getComponent("signup-alert").show();
+      }
+      return false;
+    }
+  }
+
+  logoutAction(args) {
+    let model = $App.getModel('Authentication');
+    model.logout({}).then(function(response) {
+      if(response.data.success) {
+        delete window.localStorage.erstwhileSessionKey;
+      }
+    });
+    $App.scopes.page.login = () => {
+      $App.redirect('/login')
+    }
+    console.log("here")
   }
 
   indexAction(args) {

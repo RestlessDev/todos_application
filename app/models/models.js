@@ -107,6 +107,26 @@ class Authentication extends ErstwhileModel {
       }
     }
   
+    static async logout(data, params) {
+      try {
+        let headers = {};
+        
+        if(window.localStorage.erstwhileSessionKey) {
+          headers['Erstwhile-Session'] = window.localStorage.erstwhileSessionKey;
+        }
+        
+        
+        
+        let response = await this.makeRequest('/authentication/logout', params, 'get', data, headers);
+        
+
+        
+        return response;
+      } catch(e) {
+        throw e;
+      }
+    }
+  
 }
 
 

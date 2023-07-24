@@ -6,6 +6,7 @@
     args.year = new Date().getFullYear();
   }
 
+  let today = new Date();
   let firstDayOfMonth = new Date(`${args.year}-${args.month}-1`);
   let currentDate = new Date(firstDayOfMonth);
   currentDate.setDate(firstDayOfMonth.getDate() - firstDayOfMonth.getDay())
@@ -43,7 +44,7 @@
         <% while(keepGoing) { %>
             <tr>
               <% for(let i = 0; i < 7; i++ ) { %>
-                <td id="todo-calendar-<%- currentDate.getFullYear() %>-<%- currentDate.getMonth() + 1 %>-<%- currentDate.getDate() %>" class="<%= currentDate.getMonth() + 1 != args.month ? 'inactive' : "" %>">
+                <td id="todo-calendar-<%- currentDate.getFullYear() %>-<%- currentDate.getMonth() + 1 %>-<%- currentDate.getDate() %>" class="<%= currentDate.getMonth() + 1 != args.month ? 'inactive ' : "" %><%= currentDate.getMonth() == today.getMonth() && currentDate.getFullYear() == today.getFullYear() && currentDate.getDate() == today.getDate() ? 'today' : "" %>">
                   <div class="day"><%= currentDate.getDate() %></div>
                   <div class="todo-list">
                     <% 
@@ -72,5 +73,19 @@
   </div>
 </div>
 <div class="d-lg-none">
-
+  <% 
+  if(args.todos.length > 0) {
+    for(let smallDate in normalizedTodos) {
+      let thisDate = new Date(smallDate);
+      %><p><strong><%- thisDate.toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"long", day:"numeric"}) %></strong></p><ul><%
+      for(let j in normalizedTodos[smallDate]) {
+        let todo = normalizedTodos[smallDate][j];
+        %><li><a href="/todos/edit/<%- todo.id %>" class="external-link" target="_blank" style="color: <%- todo.color %>; <% if(todo.done_flag) { %>text-decoration: line-through;<%} %>"><%- todo.title %></a></li><%
+      }
+      %></ul><%
+    }
+  } else {
+    %><p>Looks like you're all clear this month!</p><%
+  }
+  %>
 </div>
