@@ -1,4 +1,4 @@
-const ErstwhileController = require("../../framework/static/controllers/ErstwhileController");
+const { ErstwhileController } = require("erstwhile");
 const jquery = require('jquery')
 
 class TodosController extends ErstwhileController {

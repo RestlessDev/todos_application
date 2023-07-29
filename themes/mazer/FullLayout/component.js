@@ -1,7 +1,6 @@
 
-const ErstwhileComponent = require('../../../framework/static/components/ErstwhileComponent')
+const { ErstwhileComponent, ErstwhileLayout } = require('erstwhile')
 const ejs = require('ejs');
-const ErstwhileLayout = require('../../../framework/static/components/ErstwhileLayout');
 const jquery = require('jquery')
 
 class FullLayout extends ErstwhileLayout {

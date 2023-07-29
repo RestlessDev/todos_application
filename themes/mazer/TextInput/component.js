@@ -1,5 +1,5 @@
 
-const ErstwhileControl = require('../../../framework/static/components/ErstwhileControl')
+const { ErstwhileControl } = require('erstwhile')
 const ejs = require('ejs');
 const jquery = require("jquery")
 

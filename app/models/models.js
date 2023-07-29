@@ -1,6 +1,5 @@
 const axios = require('axios');
-const ErstwhileModel = require('../../framework/static/models/ErstwhileModel')
-const AuthenticationError = require('../../framework/static/errors/AuthenticationError')
+const {ErstwhileModel, AuthenticationError} = require('erstwhile')
 
 
 /**

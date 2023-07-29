@@ -1,5 +1,5 @@
 
-const ErstwhileTheme = require('../../framework/static/models/ErstwhileModel')
+const { ErstwhileTheme } = require('erstwhile')
 const ejs = require('ejs')
 const path = require('path');
 const fs = require('fs');
@@ -27,7 +27,7 @@ class MazerTheme extends ErstwhileTheme {
   }
 
   static getScripts(rootDir) {
-    return `<script defer src="${rootDir}/jquery.min.js"></script><script defer src="${rootDir}/jquery.dataTables.min.js"></script><!-- <script defer src="${rootDir}/bootstrap.bundle.min.js"></script> -->`
+    return `<script defer src="${rootDir}/jquery.min.js"></script><script defer src="${rootDir}/jquery.dataTables.min.js"></script>`
   }
   
   static getCSSLinks(rootDir) {

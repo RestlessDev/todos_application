@@ -1,4 +1,4 @@
-const ErstwhileController = require("../../framework/static/controllers/ErstwhileController");
+const { ErstwhileController } = require("erstwhile");
 
 class IndexController extends ErstwhileController {
   preAction(next) {

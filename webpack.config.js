@@ -3,7 +3,7 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
-const ErstwhileCompiler = require('./framework/static/ErstwhileCompiler')
+const {ErstwhileCompiler} = require('erstwhile')
 
 module.exports = {
   entry: './build/bootstrap.js',
