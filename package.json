@@ -16,6 +16,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "erstwhile": "^0.1.15"
+    "erstwhile": "^0.1.18"
   }
 }
