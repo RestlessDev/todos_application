@@ -36,6 +36,7 @@ class TodoCalendar extends ErstwhileComponent {
     return `
       .todo-calendar-table tr th {
         width: calc(100% * (1/7));
+        color: white;
       }
       .todo-calendar-table .inactive {
         color: #dcdcdc;
